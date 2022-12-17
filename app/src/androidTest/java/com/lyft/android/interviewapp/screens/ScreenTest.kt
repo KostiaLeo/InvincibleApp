@@ -11,7 +11,7 @@ import androidx.test.filters.MediumTest
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import com.lyft.android.interviewapp.HiltTestActivity
 import com.lyft.android.interviewapp.data.repository.Repository
-import com.lyft.android.interviewapp.ui.screen.Screen
+import com.lyft.android.interviewapp.ui.screens.Screen
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before

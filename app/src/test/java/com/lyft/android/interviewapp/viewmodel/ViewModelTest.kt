@@ -4,7 +4,6 @@ package com.lyft.android.interviewapp.viewmodel
 
 import com.lyft.android.interviewapp.domain.UseCase
 import com.lyft.android.interviewapp.fakesource.FakeRepository
-import com.lyft.android.interviewapp.ui.screen.MainViewModel
 import com.lyft.android.interviewapp.utils.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect

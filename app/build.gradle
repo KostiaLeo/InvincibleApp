@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'dagger.hilt.android.plugin'
+apply plugin: 'androidx.navigation.safeargs'
 
 android {
     namespace 'com.lyft.android.interviewapp'
@@ -24,7 +25,7 @@ android {
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
         buildConfigField "String", "API_KEY", "\"${properties.getProperty("API_KEY")}\""
 
-        buildConfigField "String", "API_BASE_URL", "\"https://myurl.com\""
+        buildConfigField "String", "API_BASE_URL", "\"https://rebuildukrainehackaton.azurewebsites.net\""
     }
 
     buildTypes {
@@ -56,6 +57,7 @@ android {
     }
     buildFeatures {
         compose true
+        viewBinding true
     }
     packagingOptions {
         resources {
@@ -68,6 +70,14 @@ android {
 }
 
 dependencies {
+
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
+    def nav_version = "2.5.3"
+
+    // Kotlin
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
     // App dependencies
     implementation "androidx.annotation:annotation:$androidXAnnotations"
