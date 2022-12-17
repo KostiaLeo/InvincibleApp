@@ -1,5 +1,8 @@
 package com.lyft.android.interviewapp.ui.screens.event_details;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import androidx.lifecycle.ViewModelProvider;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -8,6 +11,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.lyft.android.interviewapp.R;
 import com.lyft.android.interviewapp.databinding.FragmentEventDetailsBinding;
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -31,11 +36,35 @@ public class EventDetailsFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(EventDetailsViewModel.class);
         viewModel.getUiStateLiveData().observe(getViewLifecycleOwner(), this::bindUiState);
 
-        binding.details.setOnClickListener(v -> viewModel.registerToEvent());
+        binding.registerButton.setOnClickListener(v -> viewModel.registerToEvent());
     }
 
     private void bindUiState(PlaceDetailsUiState uiState) {
-        binding.details.setText(uiState.toString());
+
+        if (uiState.isLoading()){
+            binding.progressBar.setVisibility(VISIBLE);
+            binding.group.setVisibility(GONE);
+        }else {
+            binding.progressBar.setVisibility(GONE);
+            binding.group.setVisibility(VISIBLE);
+        }
+
+        if (uiState.getDetails().isRegistered()){
+            binding.registerButton.setBackgroundColor(getResources().getColor(R.color.green));
+        } else {
+            binding.registerButton.setBackgroundColor(getResources().getColor(R.color.blue));
+        }
+        binding.eventIconIV.setImageResource(uiState.getDetails().getIconResourceId());
+        binding.nameToolBarTV.setText(uiState.getDetails().getOrganizer());
+        binding.dateTV.setText(uiState.getDetails().getDateTime());
+        binding.pointsTV.setText(uiState.getDetails().getGamePoints());
+        binding.typeOfWork.setText(uiState.getDetails().getName());
+        binding.placeTV.setText(uiState.getDetails().getLocation());
+        binding.numberOfWorkersTV.setText(uiState.getDetails().getVolunteersCount());
+        binding.donationTV.setText(uiState.getDetails().getDonationsCount());
+        binding.organizerDescriptionTV.setText(uiState.getDetails().getOrganizer());
+        binding.descriptionTV.setText(uiState.getDetails().getDescription());
+        binding.dutiesTV.setText(uiState.getDetails().getDuties());
     }
 
     @Override

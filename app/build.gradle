@@ -67,6 +67,8 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion "$composeCompilerVersion"
     }
+    compileSdkVersion 32
+    buildToolsVersion '30.0.3'
 }
 
 dependencies {
