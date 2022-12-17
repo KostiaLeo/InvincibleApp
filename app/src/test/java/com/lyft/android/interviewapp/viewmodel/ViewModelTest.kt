@@ -3,7 +3,7 @@
 package com.lyft.android.interviewapp.viewmodel
 
 import com.lyft.android.interviewapp.domain.UseCase
-import com.lyft.android.interviewapp.fakesource.FakeRepository
+import com.lyft.android.interviewapp.fakesource.FakeVolunteerEventsRepository
 import com.lyft.android.interviewapp.utils.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -21,12 +21,12 @@ class ViewModelTest {
     @get:Rule
     val mainCoroutineRule = MainCoroutineRule(testDispatcher)
 
-    private lateinit var repository: FakeRepository
+    private lateinit var repository: FakeVolunteerEventsRepository
     private lateinit var viewModel: MainViewModel
 
     @Before
     fun setUp() {
-        repository = FakeRepository()
+        repository = FakeVolunteerEventsRepository()
         viewModel = MainViewModel(UseCase(repository))
     }
 

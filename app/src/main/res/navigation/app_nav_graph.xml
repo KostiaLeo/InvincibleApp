@@ -24,11 +24,11 @@
     <fragment
         android:id="@+id/eventDetailsFragment"
         android:name="com.lyft.android.interviewapp.ui.screens.event_details.EventDetailsFragment"
-        android:label="fragment_place_details"
+        android:label="fragment_event_details"
         tools:layout="@layout/fragment_event_details"
         >
         <argument
-            android:name="placeId"
+            android:name="eventId"
             app:argType="string"
             />
     </fragment>

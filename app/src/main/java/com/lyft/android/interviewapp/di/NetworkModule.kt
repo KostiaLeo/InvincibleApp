@@ -1,7 +1,7 @@
 package com.lyft.android.interviewapp.di
 
 import com.lyft.android.interviewapp.BuildConfig
-import com.lyft.android.interviewapp.data.remote.api.MainApi
+import com.lyft.android.interviewapp.data.remote.api.VolunteerEventsApi
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -11,7 +11,6 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
 import retrofit2.Retrofit
@@ -25,7 +24,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideApi(retrofit: Retrofit): MainApi {
+    fun provideApi(retrofit: Retrofit): VolunteerEventsApi {
         return retrofit.create()
     }
 

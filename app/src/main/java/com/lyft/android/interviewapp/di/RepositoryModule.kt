@@ -1,7 +1,7 @@
 package com.lyft.android.interviewapp.di
 
-import com.lyft.android.interviewapp.data.repository.DefaultRepository
-import com.lyft.android.interviewapp.data.repository.Repository
+import com.lyft.android.interviewapp.data.repository.RemoteVolunteerEventsRepository
+import com.lyft.android.interviewapp.data.repository.VolunteerEventsRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,5 +14,5 @@ interface RepositoryModule {
 
     @Binds
     @Singleton
-    fun bindMoviesRepository(defaultRepository: DefaultRepository): Repository
+    fun bindRepository(defaultRepository: RemoteVolunteerEventsRepository): VolunteerEventsRepository
 }

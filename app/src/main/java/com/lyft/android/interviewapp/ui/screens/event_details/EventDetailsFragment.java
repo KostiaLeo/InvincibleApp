@@ -14,7 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class EventDetailsFragment extends Fragment {
 
-    private EventDetailsViewModel eventDetailsViewModel;
+    private EventDetailsViewModel viewModel;
 
     private FragmentEventDetailsBinding binding;
 
@@ -28,12 +28,14 @@ public class EventDetailsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        eventDetailsViewModel = new ViewModelProvider(this).get(EventDetailsViewModel.class);
-        eventDetailsViewModel.getUiStateLiveData().observe(getViewLifecycleOwner(), this::bindUiState);
+        viewModel = new ViewModelProvider(this).get(EventDetailsViewModel.class);
+        viewModel.getUiStateLiveData().observe(getViewLifecycleOwner(), this::bindUiState);
+
+        binding.details.setOnClickListener(v -> viewModel.registerToEvent());
     }
 
     private void bindUiState(PlaceDetailsUiState uiState) {
-        binding.details.setText(uiState.getName());
+        binding.details.setText(uiState.toString());
     }
 
     @Override

@@ -10,7 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import com.lyft.android.interviewapp.HiltTestActivity
-import com.lyft.android.interviewapp.data.repository.Repository
+import com.lyft.android.interviewapp.data.repository.VolunteerEventsRepository
 import com.lyft.android.interviewapp.ui.screens.Screen
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -33,7 +33,7 @@ class ScreenTest {
     private val activity get() = composeTestRule.activity
 
     @Inject
-    lateinit var repository: Repository
+    lateinit var repository: VolunteerEventsRepository
 
     @Before
     fun setup() {
