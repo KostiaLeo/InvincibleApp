@@ -1,5 +1,8 @@
-package com.lyft.android.interviewapp.ui.screens.search
+package com.lyft.android.interviewapp.ui.screens.search.content
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -42,11 +46,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel
-import com.lyft.android.interviewapp.ui.theme.EventMetadataColor
+import com.lyft.android.interviewapp.ui.theme.PrimaryColor
 import com.lyft.android.interviewapp.ui.theme.OnSurfacePrimary
 import com.lyft.android.interviewapp.ui.theme.OnSurfaceSecondary
 import com.lyft.android.interviewapp.ui.theme.SearchScreenBackground
 import com.lyft.android.interviewapp.R
+import com.lyft.android.interviewapp.ui.screens.search.SearchViewModel
 import com.lyft.android.interviewapp.ui.theme.eUkraineFontFamily
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
@@ -62,130 +67,141 @@ fun SearchContent(
             .fillMaxSize()
             .background(SearchScreenBackground)
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .height(0.dp)
                 .weight(1f)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                Spacer(modifier = Modifier.height(16.dp))
+            if(state.isLoading) {
+                CircularProgressIndicator(color = PrimaryColor)
+            }
+            AnimatedVisibility(visible = !state.isLoading, enter = fadeIn(), exit = fadeOut()) {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                Card(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-                        .height(40.dp),
-                    shape = RoundedCornerShape(6.dp),
-                    elevation = 8.dp
-                ) {
-                    Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_search_icon),
-                            contentDescription = null,
-                            modifier = Modifier.padding(start = 12.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            fontFamily = eUkraineFontFamily,
-                            text = "Find your mission",
-                            fontSize = 12.sp,
-                            letterSpacing = 0.4.sp,
-                            color = OnSurfaceSecondary,
-                            fontWeight = FontWeight.W300
-                        )
+                    Card(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth()
+                            .height(40.dp),
+                        shape = RoundedCornerShape(6.dp),
+                        elevation = 8.dp
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.ic_search_icon),
+                                contentDescription = null,
+                                modifier = Modifier.padding(start = 12.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                fontFamily = eUkraineFontFamily,
+                                text = "Find your mission",
+                                fontSize = 12.sp,
+                                letterSpacing = 0.4.sp,
+                                color = OnSurfaceSecondary,
+                                fontWeight = FontWeight.W300
+                            )
+                        }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                Text(
-                    fontFamily = eUkraineFontFamily,
-                    text = "Nearest missions",
-                    fontWeight = FontWeight.W500,
-                    color = OnSurfacePrimary,
-                    fontSize = 16.sp,
-                    letterSpacing = 0.15.sp,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp)
-                ) {
-                    items(state.events, key = { it.id }) { event ->
-                        EventCard(
-                            event = event,
-                            onEventClicked = {
-                                onNavigateToEventDetails(event.id)
-                            }
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    fontFamily = eUkraineFontFamily,
-                    text = "Donations",
-                    fontWeight = FontWeight.W500,
-                    color = OnSurfacePrimary,
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                val funds = remember {
-                    listOf(
-                        "Caritas Ukraine" to R.drawable.donation_caritas,
-                        "National Bank" to R.drawable.donation_nbu,
-                        "DIM Foundation" to R.drawable.donation_dim_ukraine,
-                        "Caritas Ukraine" to R.drawable.donation_caritas,
-                        "National Bank" to R.drawable.donation_nbu,
-                        "DIM Foundation" to R.drawable.donation_dim_ukraine,
+                    Text(
+                        fontFamily = eUkraineFontFamily,
+                        text = "Nearest missions",
+                        fontWeight = FontWeight.W500,
+                        color = OnSurfacePrimary,
+                        fontSize = 16.sp,
+                        letterSpacing = 0.15.sp,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
-                }
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp)
-                ) {
-                    items(funds) { (name, icon) ->
-                        DonationFundCard(
-                            fundName = name,
-                            iconId = icon
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp)
+                    ) {
+                        items(state.events, key = { it.id }) { event ->
+                            EventCard(
+                                event = event,
+                                onEventClicked = {
+                                    onNavigateToEventDetails(event.id)
+                                }
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Text(
+                        fontFamily = eUkraineFontFamily,
+                        text = "Donations",
+                        fontWeight = FontWeight.W500,
+                        color = OnSurfacePrimary,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    val funds = remember {
+                        listOf(
+                            "Caritas Ukraine" to R.drawable.donation_caritas,
+                            "National Bank" to R.drawable.donation_nbu,
+                            "DIM Foundation" to R.drawable.donation_dim_ukraine,
+                            "Caritas Ukraine" to R.drawable.donation_caritas,
+                            "National Bank" to R.drawable.donation_nbu,
+                            "DIM Foundation" to R.drawable.donation_dim_ukraine,
                         )
                     }
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    fontFamily = eUkraineFontFamily,
-                    text = "In your city",
-                    fontWeight = FontWeight.W500,
-                    color = OnSurfacePrimary,
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp)
-                ) {
-                    items(state.events.asReversed(), key = { it.id }) { event ->
-                        EventCard(
-                            event = event,
-                            onEventClicked = {
-                                onNavigateToEventDetails(event.id)
-                            }
-                        )
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp)
+                    ) {
+                        items(funds) { (name, icon) ->
+                            DonationFundCard(
+                                fundName = name,
+                                iconId = icon
+                            )
+                        }
                     }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Text(
+                        fontFamily = eUkraineFontFamily,
+                        text = "In your city",
+                        fontWeight = FontWeight.W500,
+                        color = OnSurfacePrimary,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp)
+                    ) {
+                        items(state.events.asReversed(), key = { it.id }) { event ->
+                            EventCard(
+                                event = event,
+                                onEventClicked = {
+                                    onNavigateToEventDetails(event.id)
+                                }
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
         BottomNavigation(
@@ -210,7 +226,7 @@ fun SearchContent(
                 Text(
                     fontFamily = eUkraineFontFamily,
                     text = "Missions",
-                    color = EventMetadataColor,
+                    color = PrimaryColor,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.W300
                 )
@@ -374,10 +390,10 @@ fun EventMetadata(metadata: String) {
         fontWeight = FontWeight.W300,
         fontSize = 12.sp,
         letterSpacing = 0.4.sp,
-        color = EventMetadataColor,
+        color = PrimaryColor,
         modifier = Modifier
             .clip(metadataShape)
-            .border(1.dp, EventMetadataColor, metadataShape)
+            .border(1.dp, PrimaryColor, metadataShape)
             .padding(vertical = 4.dp, horizontal = 8.dp)
     )
 }
