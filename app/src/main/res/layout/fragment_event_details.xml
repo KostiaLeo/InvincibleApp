@@ -77,6 +77,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolBar"
+            android:textSize="12dp"
+            android:textFontWeight="300"
             >
 
 
@@ -93,6 +95,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:layout_marginTop="16dp"
                 >
 
                 <TextView
@@ -102,7 +105,10 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/blue_border_bg"
-                    android:padding="4dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
                     android:text="12.02.2023 12:00"
                     android:textColor="#0066CC"
                     />
@@ -114,7 +120,10 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/blue_border_bg"
-                    android:padding="4dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
                     android:text="+30G"
                     android:textColor="#0066CC"
                     />
@@ -130,8 +139,8 @@
                 android:text="Clearing roads from debris"
                 android:textColor="#000000"
                 android:textSize="32dp"
-                android:textFontWeight="500"
-                android:fontFamily="@font/e_ukraine"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
                 />
 
 
@@ -139,9 +148,13 @@
                 android:id="@+id/placeTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:layout_marginLeft="8dp"
-                android:textSize="14dp"
+                android:textSize="12dp"
+                android:textFontWeight="300"
                 android:text="Kherson, Highway M14"
+                android:textStyle="bold"
+                android:fontFamily="@font/e_ukraine"
                 />
 
             <LinearLayout
@@ -156,20 +169,28 @@
                     android:id="@+id/numberOfWorkersTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     android:layout_marginLeft="8dp"
                     android:text="12/50"
                     android:textColor="#0066CC"
+                    android:textSize="14dp"
+                    android:textFontWeight="300"
                     android:drawableLeft="@drawable/ic_baseline_person_outline_16"
+                    android:fontFamily="@font/e_ukraine"
                     />
 
                 <TextView
                     android:id="@+id/donationTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     android:layout_marginLeft="8dp"
                     android:text="2400/3000"
+                    android:textSize="14dp"
+                    android:textFontWeight="300"
                     android:textColor="#0066CC"
-                    android:drawableLeft="@drawable/ic_baseline_attach_money_16"
+                    android:drawableLeft="@drawable/ic_uah_symbol"
+                    android:fontFamily="@font/e_ukraine"
                     />
 
 
@@ -181,11 +202,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="32dp"
                 android:layout_marginRight="8dp"
                 android:text="Organizer"
                 android:textColor="#000000"
-                android:textSize="20dp"
+                android:textSize="14sp"
+                android:textFontWeight="500"
+                android:fontFamily="@font/e_ukraine"
                 android:textStyle="bold"
                 />
 
@@ -197,6 +220,8 @@
                 android:layout_marginLeft="8dp"
                 android:text="Caritas Ukraine"
                 android:textSize="14dp"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/e_ukraine"
                 />
 
             <TextView
@@ -204,12 +229,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="32dp"
                 android:layout_marginRight="8dp"
                 android:text="Description"
                 android:textColor="#000000"
-                android:textSize="20dp"
                 android:textStyle="bold"
+                android:textSize="14dp"
+                android:textFontWeight="500"
+android:fontFamily="@font/e_ukraine"
                 />
 
 
@@ -217,10 +244,13 @@
                 android:id="@+id/descriptionTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. "
-                android:textSize="14dp"
+                android:textSize="12dp"
+                android:textFontWeight="300"
+                android:fontFamily="@font/e_ukraine"
                 />
 
             <TextView
@@ -228,12 +258,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="32dp"
                 android:layout_marginRight="8dp"
                 android:text="Duties"
                 android:textColor="#000000"
-                android:textSize="20dp"
-                android:textStyle="bold"
+                android:textSize="14dp"
+                android:textFontWeight="500"
+                android:fontFamily="@font/e_ukraine"
                 />
 
             <TextView
@@ -242,8 +273,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
                 android:text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. "
-                android:textSize="14dp"
+                android:textSize="12dp"
+                android:textFontWeight="300"
+                android:fontFamily="@font/e_ukraine"
                 />
 
 
@@ -267,18 +301,18 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                android:weightSum="2"
                 >
 
 
                 <Button
                     android:id="@+id/registerButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/blue_border_bg"
-                    android:layout_marginLeft="50dp"
-                    android:paddingLeft="40dp"
-                    android:paddingRight="40dp"
                     android:layout_marginBottom="16dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="4dp"
                     android:text="Register"
                     android:textColor="#FFFF"
                     android:bottomLeftRadius="15dp"
@@ -286,20 +320,26 @@
                     android:topLeftRadius="10dp"
                     android:topRightRadius="10dp"
                     android:layout_marginTop="16dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/e_ukraine"
+                    android:textFontWeight="500"
+                    android:textSize="12sp"
                     />
 
                 <Button
                     android:id="@+id/donationButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="24dp"
                     android:layout_marginTop="16dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="8dp"
                     android:background="@drawable/blue_border_bg"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
                     android:text="Make a donation"
                     android:textColor="#0066CC"
-
+                    android:layout_weight="1"
+                    android:fontFamily="@font/e_ukraine"
+                    android:textFontWeight="500"
+                    android:textSize="12sp"
                     />
             </LinearLayout>
 
