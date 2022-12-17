@@ -130,7 +130,8 @@
                 android:text="Clearing roads from debris"
                 android:textColor="#000000"
                 android:textSize="32dp"
-                android:textStyle="bold"
+                android:textFontWeight="500"
+                android:fontFamily="@font/e_ukraine"
                 />
 
 
