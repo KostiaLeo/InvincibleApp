@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.lyft.android.interviewapp.R;
 import com.lyft.android.interviewapp.databinding.FragmentEventDetailsBinding;
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -35,6 +36,7 @@ public class EventDetailsFragment extends Fragment {
     }
 
     private void bindUiState(PlaceDetailsUiState uiState) {
+        binding.image.setImageResource(uiState.getDetails().getIconResourceId());
         binding.details.setText(uiState.toString());
     }
 
