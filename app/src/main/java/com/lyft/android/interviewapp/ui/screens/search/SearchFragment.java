@@ -1,5 +1,6 @@
 package com.lyft.android.interviewapp.ui.screens.search;
 
+import android.widget.TextView;
 import androidx.lifecycle.ViewModelProvider;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.navigation.Navigation;
 import com.lyft.android.interviewapp.R;
+import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel;
 import com.lyft.android.interviewapp.databinding.FragmentSearchBinding;
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -35,16 +37,20 @@ public class SearchFragment extends Fragment {
     }
 
     private void bindUiState(SearchUiState uiState) {
-        binding.helloWorld.setText(uiState.getData());
-        binding.helloWorld.setOnClickListener(v -> {
-            navigateToPlaceDetails("123");
-        });
+        binding.getRoot().removeAllViews();
+
+        for (ShortEventUiModel event : uiState.getEvents()) {
+            TextView textView = new TextView(requireContext());
+            textView.setText(event.toString());
+            textView.setOnClickListener(v -> navigateToEventDetails(event.getId()));
+            binding.getRoot().addView(textView);
+        }
     }
 
-    private void navigateToPlaceDetails(String placeId) {
+    private void navigateToEventDetails(String eventId) {
         Navigation
                 .findNavController(requireActivity(), R.id.nav_host_fragment)
-                .navigate(SearchFragmentDirections.actionSearchFragmentToPlaceDetailsFragment(placeId));
+                .navigate(SearchFragmentDirections.actionSearchFragmentToEventDetailsFragment(eventId));
     }
 
     @Override

@@ -1,7 +1,10 @@
 package com.lyft.android.interviewapp.data.mappers
 
+import com.lyft.android.interviewapp.R
 import com.lyft.android.interviewapp.data.remote.models.EventDetailsResponse
+import com.lyft.android.interviewapp.data.remote.models.ShortEvent
 import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
+import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Locale
@@ -11,14 +14,14 @@ private val dateFormat by lazy(LazyThreadSafetyMode.NONE) {
 }
 
 fun EventDetailsResponse.mapToUiModel(): EventDetailsUiModel {
-    val millis = Instant.parse(eventInfo.date).toEpochMilli()
-    val dateTime = dateFormat.format(millis)
-
+    val dateTime = eventInfo.date.toDateTime()
     val gamePoints = "+${eventInfo.gamePoints}G"
     val volunteersCount = "${eventInfo.curVolunteers}/${eventInfo.maxVolunteers}"
     val donationsCount = "${eventInfo.moneyDonated}/${eventInfo.moneyNeeded}"
 
     return EventDetailsUiModel(
+        id = eventInfo.id,
+        iconResourceId = eventInfo.type.getIconFromType(),
         dateTime = dateTime,
         gamePoints = gamePoints,
         name = eventInfo.name,
@@ -30,4 +33,35 @@ fun EventDetailsResponse.mapToUiModel(): EventDetailsUiModel {
         duties = eventInfo.duties,
         isRegistered = eventInfo.isRegistered
     )
+}
+
+fun ShortEvent.mapToUiModel(): ShortEventUiModel {
+    val dateTime = date.toDateTime()
+    val gamePoints = "+${gamePoints}G"
+    val volunteersCount = "$curVolunteers/$maxVolunteers"
+    val donationsCount = "$moneyDonated/$moneyNeeded"
+
+    return ShortEventUiModel(
+        id = id,
+        iconResourceId = type.getIconFromType(),
+        dateTime = dateTime,
+        gamePoints = gamePoints,
+        name = name,
+        location = location,
+        volunteersCount = volunteersCount,
+        donationsCount = donationsCount
+    )
+}
+
+private fun String.toDateTime(): String {
+    val millis = Instant.parse(this).toEpochMilli()
+    return dateFormat.format(millis)
+}
+
+private fun Int.getIconFromType(): Int {
+    return if (this % 2 == 0) {
+        R.drawable.event_icon_1
+    } else {
+        R.drawable.event_icon_2
+    }
 }

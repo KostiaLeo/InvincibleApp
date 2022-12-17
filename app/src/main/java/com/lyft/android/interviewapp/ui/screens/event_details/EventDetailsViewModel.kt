@@ -67,7 +67,7 @@ class EventDetailsViewModel @Inject constructor(
 }
 
 data class PlaceDetailsUiState(
-    val isLoading: Boolean = true,
     val details: EventDetailsUiModel = EventDetailsUiModel(),
+    val isLoading: Boolean = true,
     val errorMessage: String? = null
 )

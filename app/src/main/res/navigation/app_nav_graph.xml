@@ -13,7 +13,7 @@
         tools:layout="@layout/fragment_search"
         >
         <action
-            android:id="@+id/action_searchFragment_to_placeDetailsFragment"
+            android:id="@+id/action_searchFragment_to_eventDetailsFragment"
             app:destination="@id/eventDetailsFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
