@@ -10,6 +10,7 @@ import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,7 +20,7 @@ class SearchViewModel @Inject constructor(
     private val repository: VolunteerEventsRepository
 ): ViewModel() {
     private val _uiStateFlow = MutableStateFlow(SearchUiState())
-    val uiStateLiveData: LiveData<SearchUiState> = _uiStateFlow.asLiveData()
+    val uiStateFlow = _uiStateFlow.asStateFlow()
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.e("ERROR_ALL_EVENTS", throwable.localizedMessage, throwable)
