@@ -41,18 +41,24 @@ public class EventDetailsFragment extends Fragment {
 
     private void bindUiState(PlaceDetailsUiState uiState) {
 
-        if (uiState.isLoading()){
+        if (uiState.isLoading()) {
             binding.progressBar.setVisibility(VISIBLE);
-            binding.group.setVisibility(GONE);
+            binding.linearLayout2.setVisibility(View.INVISIBLE);
+            binding.toolBar.setVisibility(View.INVISIBLE);
+            binding.cardView.setVisibility(View.INVISIBLE);
         }else {
-            binding.progressBar.setVisibility(GONE);
-            binding.group.setVisibility(VISIBLE);
+            binding.progressBar.setVisibility(View.INVISIBLE);
+            binding.linearLayout2.setVisibility(VISIBLE);
+            binding.toolBar.setVisibility(VISIBLE);
+            binding.cardView.setVisibility(VISIBLE);
         }
 
-        if (uiState.getDetails().isRegistered()){
-            binding.registerButton.setBackgroundColor(getResources().getColor(R.color.green));
+        if (uiState.getDetails().isRegistered()) {
+            binding.registerButton.setBackgroundResource(R.drawable.green_bg_rounded);
+            binding.registerButton.setText("Registered");
         } else {
-            binding.registerButton.setBackgroundColor(getResources().getColor(R.color.blue));
+            binding.registerButton.setBackgroundResource(R.drawable.blue_bg_rounded);
+            binding.registerButton.setText("Register");
         }
         binding.eventIconIV.setImageResource(uiState.getDetails().getIconResourceId());
         binding.nameToolBarTV.setText(uiState.getDetails().getOrganizer());

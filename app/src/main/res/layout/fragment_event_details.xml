@@ -12,15 +12,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/group"
-        app:constraint_referenced_ids="eventIconIV, pointsTV, typeOfWork, placeTV,
-            numberOfWorkersTV, donationTV, organizerTV, organizerDescriptionTV,
-            descriptionTV, descriptionTitleTV, dutiesTV, dutiesTitleTV"/>
+        app:constraint_referenced_ids="linearLayout2, cardView"
+        />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-
+        android:layout_height="match_parent"
+        >
 
 
         <androidx.appcompat.widget.Toolbar
@@ -30,27 +28,31 @@
             android:background="#0066CC"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            >
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                >
 
                 <ImageView
                     android:id="@+id/arrowIV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:src="@drawable/ic_baseline_arrow_back_36"
-                   />
+                    />
 
                 <TextView
                     android:id="@+id/nameToolBarTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Ceritas Ukraine"
-                    android:layout_centerHorizontal="true"
+                    android:layout_centerInParent="true"
                     android:textColor="#FFFF"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    />
 
                 <ImageView
                     android:id="@+id/saveIV"
@@ -58,7 +60,9 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_marginRight="20dp"
-                    android:src="@drawable/ic_baseline_bookmark_border_36" />
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_baseline_bookmark_border_36"
+                    />
             </RelativeLayout>
 
 
@@ -72,7 +76,8 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolBar">
+            app:layout_constraintTop_toBottomOf="@+id/toolBar"
+            >
 
 
             <ImageView
@@ -81,12 +86,14 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="Event icon "
                 android:scaleType="centerCrop"
-                android:src="@drawable/event_icon_1" />
+                android:src="@drawable/event_icon_1"
+                />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                >
 
                 <TextView
                     android:id="@+id/dateTV"
@@ -97,7 +104,8 @@
                     android:background="@drawable/blue_border_bg"
                     android:padding="4dp"
                     android:text="12.02.2023 12:00"
-                    android:textColor="#0066CC" />
+                    android:textColor="#0066CC"
+                    />
 
                 <TextView
                     android:id="@+id/pointsTV"
@@ -108,7 +116,8 @@
                     android:background="@drawable/blue_border_bg"
                     android:padding="4dp"
                     android:text="+30G"
-                    android:textColor="#0066CC" />
+                    android:textColor="#0066CC"
+                    />
 
             </LinearLayout>
 
@@ -121,7 +130,8 @@
                 android:text="Clearing roads from debris"
                 android:textColor="#000000"
                 android:textSize="32dp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                />
 
 
             <TextView
@@ -130,13 +140,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:textSize="14dp"
-                android:text="Kherson, Highway M14" />
+                android:text="Kherson, Highway M14"
+                />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                >
 
 
                 <TextView
@@ -146,7 +158,8 @@
                     android:layout_marginLeft="8dp"
                     android:text="12/50"
                     android:textColor="#0066CC"
-                    android:drawableLeft="@drawable/ic_baseline_person_outline_16"/>
+                    android:drawableLeft="@drawable/ic_baseline_person_outline_16"
+                    />
 
                 <TextView
                     android:id="@+id/donationTV"
@@ -172,7 +185,8 @@
                 android:text="Organizer"
                 android:textColor="#000000"
                 android:textSize="20dp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                />
 
 
             <TextView
@@ -181,7 +195,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:text="Caritas Ukraine"
-                android:textSize="14dp"/>
+                android:textSize="14dp"
+                />
 
             <TextView
                 android:id="@+id/descriptionTitleTV"
@@ -193,7 +208,8 @@
                 android:text="Description"
                 android:textColor="#000000"
                 android:textSize="20dp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                />
 
 
             <TextView
@@ -216,7 +232,8 @@
                 android:text="Duties"
                 android:textColor="#000000"
                 android:textSize="20dp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                />
 
             <TextView
                 android:id="@+id/dutiesTV"
@@ -225,21 +242,21 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. "
-                android:textSize="14dp"/>
+                android:textSize="14dp"
+                />
 
 
         </LinearLayout>
 
 
         <androidx.cardview.widget.CardView
-
             android:id="@+id/cardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             android:translationZ="16dp"
             app:cardElevation="16dp"
-           >
+            >
 
             <LinearLayout
                 android:id="@+id/linearLayout"
@@ -248,7 +265,8 @@
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                app:layout_constraintStart_toStartOf="parent"
+                >
 
 
                 <Button
@@ -257,7 +275,6 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/blue_border_bg"
                     android:layout_marginLeft="50dp"
-                    android:backgroundTint="#0066CC"
                     android:paddingLeft="40dp"
                     android:paddingRight="40dp"
                     android:layout_marginBottom="16dp"
@@ -268,7 +285,7 @@
                     android:topLeftRadius="10dp"
                     android:topRightRadius="10dp"
                     android:layout_marginTop="16dp"
-                />
+                    />
 
                 <Button
                     android:id="@+id/donationButton"
@@ -288,18 +305,17 @@
         </androidx.cardview.widget.CardView>
 
         <ProgressBar
+            tools:visibility="gone"
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="700dp"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 
 
 </FrameLayout>
