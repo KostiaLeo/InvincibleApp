@@ -4,13 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.lyft.android.interviewapp.R
-import com.lyft.android.interviewapp.ui.screens.search.content.SearchContent
+import com.lyft.android.interviewapp.ui.screens.search.content.SearchScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,7 +23,7 @@ class SearchFragment : Fragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                SearchContent(
+                SearchScreen(
                     viewModel = viewModel,
                     onNavigateToEventDetails = ::navigateToEventDetails
                 )
