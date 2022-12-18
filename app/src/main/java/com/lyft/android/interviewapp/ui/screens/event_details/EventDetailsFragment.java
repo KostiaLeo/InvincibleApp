@@ -26,6 +26,7 @@ public class EventDetailsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
+        requireActivity().getWindow().setStatusBarColor(getResources().getColor(R.color.white));
         binding = FragmentEventDetailsBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -47,6 +48,7 @@ public class EventDetailsFragment extends Fragment {
             binding.toolBar.setVisibility(View.INVISIBLE);
             binding.cardView.setVisibility(View.INVISIBLE);
         }else {
+            setupStatusBarColor();
             binding.progressBar.setVisibility(View.INVISIBLE);
             binding.linearLayout2.setVisibility(VISIBLE);
             binding.toolBar.setVisibility(VISIBLE);
@@ -71,6 +73,14 @@ public class EventDetailsFragment extends Fragment {
         binding.organizerDescriptionTV.setText(uiState.getDetails().getOrganizer());
         binding.descriptionTV.setText(uiState.getDetails().getDescription());
         binding.dutiesTV.setText(uiState.getDetails().getDuties());
+    }
+
+    private void setupStatusBarColor() {
+        View decorView = requireActivity().getWindow().getDecorView();
+        int uiVisibility = decorView.getSystemUiVisibility();
+        uiVisibility &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        decorView.setSystemUiVisibility(uiVisibility);
+        requireActivity().getWindow().setStatusBarColor(getResources().getColor(R.color.blue));
     }
 
     @Override
