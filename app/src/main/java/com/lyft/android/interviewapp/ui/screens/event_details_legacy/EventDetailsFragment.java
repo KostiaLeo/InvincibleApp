@@ -1,4 +1,4 @@
-package com.lyft.android.interviewapp.ui.screens.event_details;
+package com.lyft.android.interviewapp.ui.screens.event_details_legacy;
 
 import static android.view.View.VISIBLE;
 
@@ -15,6 +15,8 @@ import androidx.navigation.Navigation;
 
 import com.lyft.android.interviewapp.R;
 import com.lyft.android.interviewapp.databinding.FragmentEventDetailsBinding;
+import com.lyft.android.interviewapp.ui.screens.details.EventDetailsViewModel;
+import com.lyft.android.interviewapp.ui.screens.details.PlaceDetailsUiState;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -37,7 +39,7 @@ public class EventDetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(EventDetailsViewModel.class);
-        viewModel.getUiStateLiveData().observe(getViewLifecycleOwner(), this::bindUiState);
+//        viewModel.getUiStateLiveData().observe(getViewLifecycleOwner(), this::bindUiState);
 
         binding.registerButton.setOnClickListener(v -> viewModel.registerToEvent());
         binding.arrowIV.setOnClickListener(v -> Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigateUp());

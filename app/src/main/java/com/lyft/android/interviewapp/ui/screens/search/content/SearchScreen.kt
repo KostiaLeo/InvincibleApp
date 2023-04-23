@@ -68,18 +68,18 @@ fun SearchScreen(
 @Composable
 private fun EventsContent(
     state: SearchUiState,
-    onNavigateToEventDetails: (id: String) -> Unit
+    onEventClicked: (id: String) -> Unit
 ) {
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         Spacer(modifier = Modifier.height(16.dp))
 
         FindYourMissionCard()
 
-        NearestMissionsSection(state, onNavigateToEventDetails)
+        NearestMissionsSection(state, onEventClicked)
 
         DonationsSection()
 
-        InYourCitySection(state, onNavigateToEventDetails)
+        InYourCitySection(state, onEventClicked)
     }
 }
 
@@ -124,7 +124,7 @@ fun FindYourMissionCard() {
 @Composable
 private fun NearestMissionsSection(
     state: SearchUiState,
-    onNavigateToEventDetails: (id: String) -> Unit
+    onEventClicked: (id: String) -> Unit
 ) {
     SectionTitle(text = "Nearest missions")
 
@@ -135,7 +135,7 @@ private fun NearestMissionsSection(
         items(state.events, key = { it.id }) { event ->
             EventCard(
                 event = event,
-                onEventClicked = { onNavigateToEventDetails(event.id) }
+                onEventClicked = { onEventClicked(event.id) }
             )
         }
     }

@@ -1,15 +1,16 @@
-package com.lyft.android.interviewapp.ui.screens.event_details
+package com.lyft.android.interviewapp.ui.screens.details
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.lyft.android.interviewapp.data.repository.VolunteerEventsRepository
 import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
+import com.lyft.android.interviewapp.ui.navigation.NavArguments
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,10 +21,10 @@ class EventDetailsViewModel @Inject constructor(
     private val repository: VolunteerEventsRepository
 ) : ViewModel() {
     private val _uiStateFlow = MutableStateFlow(PlaceDetailsUiState())
-    val uiStateLiveData = _uiStateFlow.asLiveData()
+    val uiStateFlow = _uiStateFlow.asStateFlow()
 
-    private val args = EventDetailsFragmentArgs.fromSavedStateHandle(savedStateHandle)
-    private val eventId by lazy { args.eventId }
+    private val eventId: String by lazy { savedStateHandle[NavArguments.eventId]!! }
+
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         handleError(throwable)
     }

@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.lyft.android.interviewapp.ui.screens.details.EventDetailsScreen
 import com.lyft.android.interviewapp.ui.screens.login.LoginScreen
 import com.lyft.android.interviewapp.ui.screens.search.content.SearchScreen
 
@@ -47,7 +48,7 @@ fun AppNavHost(
             route = Routes.eventDetails,
             arguments = listOf(navArgument(NavArguments.eventId) { type = NavType.StringType })
         ) {
-//            DetailsScreen() todo: implement DetailsScreen using Jetpack Compose
+            EventDetailsScreen()
         }
     }
 }
