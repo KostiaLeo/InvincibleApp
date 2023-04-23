@@ -54,4 +54,5 @@ ext {
     datastoreVersion = '1.0.0'
     retrofitVersion = '2.9.0'
     moshiVersion = '1.14.0'
+    playServicesVersion = '20.5.0'
 }

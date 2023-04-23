@@ -1,23 +1,16 @@
 package com.lyft.android.interviewapp.ui.screens.search.content
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,24 +27,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.material.bottomnavigation.BottomNavigationItemView
-import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel
-import com.lyft.android.interviewapp.ui.theme.PrimaryColor
-import com.lyft.android.interviewapp.ui.theme.OnSurfacePrimary
-import com.lyft.android.interviewapp.ui.theme.OnSurfaceSecondary
-import com.lyft.android.interviewapp.ui.theme.SearchScreenBackground
 import com.lyft.android.interviewapp.R
+import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel
+import com.lyft.android.interviewapp.data.signin.SignInGoogleContract
+import com.lyft.android.interviewapp.ui.screens.login.LoginViewModel
 import com.lyft.android.interviewapp.ui.screens.search.SearchUiState
 import com.lyft.android.interviewapp.ui.screens.search.SearchViewModel
-import com.lyft.android.interviewapp.ui.theme.eUkraineFontFamily
+import com.lyft.android.interviewapp.ui.theme.*
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel,
+    loginViewModel: LoginViewModel,
     onNavigateToEventDetails: (id: String) -> Unit
 ) {
     val state by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+    val authResultLauncher = rememberLauncherForActivityResult(
+        contract = SignInGoogleContract,
+        onResult = loginViewModel::handleGoogleAccountTask
+    )
 
     Column(
         modifier = Modifier
@@ -70,7 +65,13 @@ fun SearchScreen(
                 CircularProgressIndicator(color = PrimaryColor)
             }
             AnimatedVisibility(visible = !state.isLoading, enter = fadeIn(), exit = fadeOut()) {
-                EventsContent(state, onNavigateToEventDetails)
+                EventsContent(
+                    state,
+                    onLoginClicked = {
+                        authResultLauncher.launch(1)
+                    },
+                    onNavigateToEventDetails
+                )
             }
         }
         BottomNavigationBar()
@@ -80,9 +81,16 @@ fun SearchScreen(
 @Composable
 private fun EventsContent(
     state: SearchUiState,
+    onLoginClicked: () -> Unit,
     onNavigateToEventDetails: (id: String) -> Unit
 ) {
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = onLoginClicked) {
+            Text(text = "Sign in with Google")
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         FindYourMissionCard()
