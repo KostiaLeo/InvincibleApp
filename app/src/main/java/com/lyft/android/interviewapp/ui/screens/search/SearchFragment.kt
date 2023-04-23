@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.lyft.android.interviewapp.R
-import com.lyft.android.interviewapp.ui.screens.login.LoginViewModel
 import com.lyft.android.interviewapp.ui.screens.search.content.SearchScreen
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,7 +16,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class SearchFragment : Fragment() {
 
     private val viewModel: SearchViewModel by viewModels()
-    private val loginViewModel: LoginViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         requireActivity().window.statusBarColor = resources.getColor(R.color.light_blue)
@@ -27,8 +25,7 @@ class SearchFragment : Fragment() {
             setContent {
                 SearchScreen(
                     viewModel = viewModel,
-                    loginViewModel = loginViewModel,
-                    onNavigateToEventDetails = ::navigateToEventDetails
+                    onEventClicked = ::navigateToEventDetails
                 )
             }
         }

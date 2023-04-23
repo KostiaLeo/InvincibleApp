@@ -23,7 +23,7 @@ class EventDetailsViewModel @Inject constructor(
     val uiStateLiveData = _uiStateFlow.asLiveData()
 
     private val args = EventDetailsFragmentArgs.fromSavedStateHandle(savedStateHandle)
-
+    private val eventId by lazy { args.eventId }
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         handleError(throwable)
     }
@@ -34,7 +34,7 @@ class EventDetailsViewModel @Inject constructor(
 
     private fun loadEvent() {
         viewModelScope.launch(exceptionHandler) {
-            val eventDetails = repository.getEventDetails(args.eventId)
+            val eventDetails = repository.getEventDetails(eventId)
             _uiStateFlow.update { it.copy(isLoading = false, details = eventDetails) }
         }
     }
@@ -42,7 +42,7 @@ class EventDetailsViewModel @Inject constructor(
     fun registerToEvent() {
         viewModelScope.launch(exceptionHandler) {
             _uiStateFlow.update { it.copy(isLoading = true) }
-            val registerResponse = repository.registerForEvent(args.eventId)
+            val registerResponse = repository.registerForEvent(eventId)
             _uiStateFlow.update {
                 it.copy(
                     isLoading = false,

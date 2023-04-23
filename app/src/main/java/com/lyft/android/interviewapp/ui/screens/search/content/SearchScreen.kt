@@ -1,6 +1,5 @@
 package com.lyft.android.interviewapp.ui.screens.search.content
 
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -25,12 +24,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lyft.android.interviewapp.R
 import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel
-import com.lyft.android.interviewapp.data.signin.SignInGoogleContract
-import com.lyft.android.interviewapp.ui.screens.login.LoginViewModel
 import com.lyft.android.interviewapp.ui.screens.search.SearchUiState
 import com.lyft.android.interviewapp.ui.screens.search.SearchViewModel
 import com.lyft.android.interviewapp.ui.theme.*
@@ -38,15 +36,10 @@ import com.lyft.android.interviewapp.ui.theme.*
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun SearchScreen(
-    viewModel: SearchViewModel,
-    loginViewModel: LoginViewModel,
-    onNavigateToEventDetails: (id: String) -> Unit
+    viewModel: SearchViewModel = hiltViewModel(),
+    onEventClicked: (id: String) -> Unit
 ) {
     val state by viewModel.uiStateFlow.collectAsStateWithLifecycle()
-    val authResultLauncher = rememberLauncherForActivityResult(
-        contract = SignInGoogleContract,
-        onResult = loginViewModel::handleGoogleAccountTask
-    )
 
     Column(
         modifier = Modifier
@@ -65,13 +58,7 @@ fun SearchScreen(
                 CircularProgressIndicator(color = PrimaryColor)
             }
             AnimatedVisibility(visible = !state.isLoading, enter = fadeIn(), exit = fadeOut()) {
-                EventsContent(
-                    state,
-                    onLoginClicked = {
-                        authResultLauncher.launch(1)
-                    },
-                    onNavigateToEventDetails
-                )
+                EventsContent(state, onEventClicked)
             }
         }
         BottomNavigationBar()
@@ -81,16 +68,9 @@ fun SearchScreen(
 @Composable
 private fun EventsContent(
     state: SearchUiState,
-    onLoginClicked: () -> Unit,
     onNavigateToEventDetails: (id: String) -> Unit
 ) {
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = onLoginClicked) {
-            Text(text = "Sign in with Google")
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         FindYourMissionCard()
