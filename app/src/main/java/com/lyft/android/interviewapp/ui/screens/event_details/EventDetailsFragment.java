@@ -1,19 +1,21 @@
 package com.lyft.android.interviewapp.ui.screens.event_details;
 
-import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-import androidx.lifecycle.ViewModelProvider;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+
 import com.lyft.android.interviewapp.R;
 import com.lyft.android.interviewapp.databinding.FragmentEventDetailsBinding;
+
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
@@ -38,6 +40,7 @@ public class EventDetailsFragment extends Fragment {
         viewModel.getUiStateLiveData().observe(getViewLifecycleOwner(), this::bindUiState);
 
         binding.registerButton.setOnClickListener(v -> viewModel.registerToEvent());
+        binding.arrowIV.setOnClickListener(v -> Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigateUp());
     }
 
     private void bindUiState(PlaceDetailsUiState uiState) {
@@ -47,7 +50,7 @@ public class EventDetailsFragment extends Fragment {
             binding.linearLayout2.setVisibility(View.INVISIBLE);
             binding.toolBar.setVisibility(View.INVISIBLE);
             binding.cardView.setVisibility(View.INVISIBLE);
-        }else {
+        } else {
             setupStatusBarColor();
             binding.progressBar.setVisibility(View.INVISIBLE);
             binding.linearLayout2.setVisibility(VISIBLE);
