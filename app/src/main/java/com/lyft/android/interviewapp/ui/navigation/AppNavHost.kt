@@ -16,6 +16,9 @@ import androidx.navigation.navArgument
 import com.lyft.android.interviewapp.ui.screens.details.EventDetailsScreen
 import com.lyft.android.interviewapp.ui.screens.details.EventDetailsViewModel
 import com.lyft.android.interviewapp.ui.screens.login.LoginScreen
+import com.lyft.android.interviewapp.ui.screens.login.LoginViewModel
+import com.lyft.android.interviewapp.ui.screens.onboarding.OnBoardingScreen
+import com.lyft.android.interviewapp.ui.screens.onboarding.OnBoardingViewModel
 import com.lyft.android.interviewapp.ui.screens.search.content.SearchScreen
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
@@ -33,10 +36,37 @@ fun AppNavHost(
         composable(
             route = Routes.login
         ) {
+            val viewModel: LoginViewModel = hiltViewModel()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
             LoginScreen(
-                onLoginCompleted = {
-                    navController.navigate(Routes.search)
+                state = state,
+                onAuthResult = viewModel::handleGoogleAccountTask,
+                onLoginCompleted = { isNewUser, userName ->
+                    if (isNewUser) {
+                        val graph = navController.graph.nodes.toString()
+                        println(graph)
+                        navController.navigate(Navigation.onBoardingDestination(userName))
+                    } else {
+                        navController.navigate(Routes.search)
+                    }
                 }
+            )
+        }
+
+        composable(
+            route = Routes.onBoarding,
+            arguments = listOf(navArgument(NavArguments.userName) { type = NavType.StringType })
+        ) {
+            val viewModel: OnBoardingViewModel = hiltViewModel()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+            OnBoardingScreen(
+                state = state,
+                onNameChanged = viewModel::onNameChanged,
+                onCitySelected = viewModel::onCitySelected,
+                onCreateAccountClicked = viewModel::createAccount,
+                onAccountCreated = { navController.navigate(Routes.search) },
+                onCloseClicked = navController::popBackStack
             )
         }
 

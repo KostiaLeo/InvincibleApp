@@ -25,5 +25,6 @@ var SharedPreferences.idToken: String?
     get() = getString("idToken", null)
     set(value) = edit { putString("idToken", value) }
 
-val SharedPreferences.isSignedIn: Boolean
-    get() = idToken != null
+var SharedPreferences.isSignedIn: Boolean
+    get() = false//getBoolean("isSignedIn", false)
+    set(value) = edit { putBoolean("isSignedIn", value) }

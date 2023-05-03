@@ -9,12 +9,12 @@ import retrofit2.http.Path
 
 interface VolunteerEventsApi {
 
-    @GET("api/events")
+    @GET("events")
     suspend fun getAllEvents(): AllEventsApiResponse
 
-    @GET("api/events/{id}")
+    @GET("events/{id}")
     suspend fun getEventDetails(@Path("id") id: String): EventDetailsResponse
 
-    @POST("api/events/{id}/register")
+    @POST("events/{id}/register")
     suspend fun registerForEvent(@Path("id") id: String): RegisterForEventResponse
 }

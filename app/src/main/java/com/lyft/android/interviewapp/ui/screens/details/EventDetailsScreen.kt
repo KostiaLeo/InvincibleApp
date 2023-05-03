@@ -14,7 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
-import com.lyft.android.interviewapp.ui.theme.InterviewAppTheme
+import com.lyft.android.interviewapp.ui.theme.AppTheme
 import com.lyft.android.interviewapp.ui.theme.PrimaryColor
 
 @Composable
@@ -107,7 +107,7 @@ fun EventDetailsBottomBar(
 @Composable
 @Preview
 fun EventDetailsScreenPreview() {
-    InterviewAppTheme {
+    AppTheme {
         EventDetailsScreen(
             state = PlaceDetailsUiState(
                 details = EventDetailsUiModel(

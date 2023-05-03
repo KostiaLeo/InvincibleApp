@@ -8,11 +8,8 @@ data class ShortEvent(
     val id: String,
     val name: String,
     val date: String,
-    val gamePoints: Int,
     val location: String,
     val curVolunteers: Int,
     val maxVolunteers: Int,
-    val moneyDonated: Int,
-    val moneyNeeded: Int,
     val type: Int
 )

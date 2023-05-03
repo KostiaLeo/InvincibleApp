@@ -10,5 +10,4 @@ data class ShortEventUiModel(
     val name: String = "",
     val location: String = "",
     val volunteersCount: String = "", // 12/50
-    val donationsCount: String = "", // 2400/3000
 )

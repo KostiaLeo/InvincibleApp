@@ -1,5 +1,7 @@
 package com.lyft.android.interviewapp.ui.screens.search.content
 
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -12,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -19,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +43,15 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
     onEventClicked: (id: String) -> Unit
 ) {
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        (context as AppCompatActivity).run {
+            window.navigationBarColor = getColor(android.R.color.white)
+            window.statusBarColor = getColor(android.R.color.white)
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
+    }
+
     val state by viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
     Column(
@@ -249,25 +262,6 @@ fun EventCard(event: ShortEventUiModel, onEventClicked: () -> Unit) {
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_uah_symbol),
-                        modifier = Modifier
-                            .height(12.dp),
-                        contentScale = ContentScale.FillHeight,
-                        contentDescription = null
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        fontFamily = eUkraineFontFamily,
-                        text = event.donationsCount,
-                        fontSize = 14.sp,
-                        color = OnSurfacePrimary,
-                        fontWeight = FontWeight.W400
-                    )
-                }
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {

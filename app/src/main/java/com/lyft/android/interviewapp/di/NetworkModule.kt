@@ -10,6 +10,7 @@ import com.lyft.android.interviewapp.data.network.GoogleTokenProvider
 import com.lyft.android.interviewapp.data.network.TokenProvider
 import com.lyft.android.interviewapp.data.network.TokenRefreshInterceptor
 import com.lyft.android.interviewapp.data.remote.api.VolunteerEventsApi
+import com.lyft.android.interviewapp.data.remote.api.VolunteerIdentityApi
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Binds
@@ -34,7 +35,13 @@ abstract class NetworkModule {
     companion object {
         @Provides
         @Singleton
-        fun provideApi(retrofit: Retrofit): VolunteerEventsApi {
+        fun provideEventsApi(retrofit: Retrofit): VolunteerEventsApi {
+            return retrofit.create()
+        }
+
+        @Provides
+        @Singleton
+        fun provideIdentityApi(retrofit: Retrofit): VolunteerIdentityApi {
             return retrofit.create()
         }
 

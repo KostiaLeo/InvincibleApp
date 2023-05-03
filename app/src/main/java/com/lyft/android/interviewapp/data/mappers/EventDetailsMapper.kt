@@ -7,7 +7,7 @@ import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
 import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel
 import java.text.SimpleDateFormat
 import java.time.Instant
-import java.util.Locale
+import java.util.*
 
 private val dateFormat by lazy(LazyThreadSafetyMode.NONE) {
     SimpleDateFormat("dd.MM.yyyy hh:mm", Locale.ENGLISH)
@@ -37,9 +37,8 @@ fun EventDetailsResponse.mapToUiModel(): EventDetailsUiModel {
 
 fun ShortEvent.mapToUiModel(): ShortEventUiModel {
     val dateTime = date.toDateTime()
-    val gamePoints = "+${gamePoints}G"
+    val gamePoints = "+10G"
     val volunteersCount = "$curVolunteers/$maxVolunteers"
-    val donationsCount = "$moneyDonated/$moneyNeeded"
 
     return ShortEventUiModel(
         id = id,
@@ -48,8 +47,7 @@ fun ShortEvent.mapToUiModel(): ShortEventUiModel {
         gamePoints = gamePoints,
         name = name,
         location = location,
-        volunteersCount = volunteersCount,
-        donationsCount = donationsCount
+        volunteersCount = volunteersCount
     )
 }
 
