@@ -1,14 +1,18 @@
 package com.lyft.android.interviewapp.ui.screens.home
 
+import android.view.View
 import androidx.annotation.DrawableRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -28,6 +32,15 @@ import com.lyft.android.interviewapp.ui.theme.TextColor
 
 @Composable
 fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        (context as AppCompatActivity).run {
+            window.navigationBarColor = getColor(android.R.color.white)
+            window.statusBarColor = getColor(android.R.color.white)
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
+    }
+
     val items = remember {
         listOf(
             HomeTabScreen.Search,

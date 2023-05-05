@@ -40,7 +40,7 @@ fun SearchScreen(
             .background(Color.White)
     ) {
         Surface(elevation = 4.dp) {
-            Column(modifier = Modifier) {
+            Column {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
