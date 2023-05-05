@@ -12,12 +12,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.*
 import com.lyft.android.interviewapp.R
 import com.lyft.android.interviewapp.ui.navigation.Routes
+import com.lyft.android.interviewapp.ui.screens.search.SearchViewModel
 import com.lyft.android.interviewapp.ui.screens.search.content.SearchScreen
 import com.lyft.android.interviewapp.ui.theme.PrimaryColor
 import com.lyft.android.interviewapp.ui.theme.TextColor
@@ -98,6 +102,7 @@ fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 private fun NavGraphBuilder.searchEventsGraph(
     onEventClicked: (eventId: String) -> Unit
 ) {
@@ -105,7 +110,9 @@ private fun NavGraphBuilder.searchEventsGraph(
         composable(
             route = Routes.search
         ) {
+            val state by hiltViewModel<SearchViewModel>().uiStateFlow.collectAsStateWithLifecycle()
             SearchScreen(
+                state = state,
                 onEventClicked = onEventClicked
             )
         }
@@ -121,6 +128,5 @@ sealed class HomeTabScreen(
     object MyMissions : HomeTabScreen(Routes.myMissions, "Мої місії", R.drawable.ic_my_missions)
     object Achievements :
         HomeTabScreen(Routes.achievements, "Досягнення", R.drawable.ic_achievements)
-
     object Profile : HomeTabScreen(Routes.profile, "Профіль", R.drawable.ic_profile)
 }

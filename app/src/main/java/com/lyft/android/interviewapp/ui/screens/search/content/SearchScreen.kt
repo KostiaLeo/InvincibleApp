@@ -1,46 +1,124 @@
 package com.lyft.android.interviewapp.ui.screens.search.content
 
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lyft.android.interviewapp.R
-import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel
 import com.lyft.android.interviewapp.ui.screens.search.SearchUiState
-import com.lyft.android.interviewapp.ui.screens.search.SearchViewModel
 import com.lyft.android.interviewapp.ui.theme.*
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun SearchScreen(
-    viewModel: SearchViewModel = hiltViewModel(),
+    state: SearchUiState,
+    onEventClicked: (id: String) -> Unit
+) {
+    val tabs = listOf("Вінниця", "Київ", "Миколаїв", "Херсон", "Одеса")
+    var selectedTabIndex by remember { mutableStateOf(0) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        Surface(elevation = 4.dp) {
+            Column(modifier = Modifier) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Add your content here
+
+                    FindYourMissionCard(modifier = Modifier.weight(1f))
+
+                    IconButton(
+                        onClick = { /* Handle filter icon click */ },
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.ic_filter),
+                            contentDescription = "Filter",
+                            tint = TextColor
+                        )
+                    }
+                }
+
+                // Add your TabRow composable here
+                ScrollableTabRow(
+                    backgroundColor = Color.White,
+                    selectedTabIndex = selectedTabIndex,
+                    indicator = { tabPositions ->
+                        TabRowDefaults.Indicator(
+                            Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                            color = PrimaryColor
+                        )
+                    },
+                    divider = {},
+                    edgePadding = 16.dp
+                ) {
+                    tabs.forEachIndexed { index, title ->
+                        val selected = selectedTabIndex == index
+                        val fontWeight = if (selected) FontWeight.W500 else FontWeight.W300
+
+                        Tab(
+                            text = {
+                                Text(
+                                    text = title,
+                                    fontWeight = fontWeight,
+                                    letterSpacing = 0.2.sp
+                                )
+                            },
+                            selectedContentColor = PrimaryColor,
+                            unselectedContentColor = TabTextColor,
+                            selected = selected,
+                            onClick = { selectedTabIndex = index }
+                        )
+                    }
+                }
+            }
+        }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Add your items to the list here
+            items(state.events) { event ->
+                EventCard(
+                    event = event,
+                    onEventClicked = {
+                        onEventClicked(event.id)
+                    }
+                )
+            }
+        }
+    }
+}
+
+/*@Composable
+fun SearchScreenLegacy(
+    state: SearchUiState,
     onEventClicked: (id: String) -> Unit
 ) {
     val context = LocalContext.current
@@ -51,8 +129,6 @@ fun SearchScreen(
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
     }
-
-    val state by viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -76,7 +152,7 @@ fun SearchScreen(
         }
         BottomNavigationBar()
     }
-}
+}*/
 
 @Composable
 private fun EventsContent(
@@ -90,21 +166,17 @@ private fun EventsContent(
 
         NearestMissionsSection(state, onEventClicked)
 
-        DonationsSection()
-
-        InYourCitySection(state, onEventClicked)
     }
 }
 
 @Composable
-fun FindYourMissionCard() {
-    Card(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
+fun FindYourMissionCard(modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier
             .fillMaxWidth()
             .height(40.dp),
-        shape = RoundedCornerShape(6.dp),
-        elevation = 8.dp
+        shape = RoundedCornerShape(8.dp),
+        color = TextFieldBackgroundColor
     ) {
         Row(
             modifier = Modifier
@@ -123,11 +195,10 @@ fun FindYourMissionCard() {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                fontFamily = eUkraineFontFamily,
-                text = "Find your mission",
-                fontSize = 12.sp,
+                text = "Пошук місії",
+                fontSize = 14.sp,
                 letterSpacing = 0.4.sp,
-                color = OnSurfaceSecondary,
+                color = HintTextColor,
                 fontWeight = FontWeight.W300
             )
         }
@@ -150,137 +221,6 @@ private fun NearestMissionsSection(
                 event = event,
                 onEventClicked = { onEventClicked(event.id) }
             )
-        }
-    }
-}
-
-@Composable
-private fun DonationsSection() {
-    SectionTitle(text = "Donations")
-
-    val funds = remember {
-        listOf(
-            "Caritas Ukraine" to R.drawable.donation_caritas,
-            "National Bank" to R.drawable.donation_nbu,
-            "DIM Foundation" to R.drawable.donation_dim_ukraine,
-            "Caritas Ukraine" to R.drawable.donation_caritas,
-            "National Bank" to R.drawable.donation_nbu,
-            "DIM Foundation" to R.drawable.donation_dim_ukraine,
-        )
-    }
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp)
-    ) {
-        items(funds) { (name, icon) ->
-            DonationFundCard(
-                fundName = name,
-                iconId = icon
-            )
-        }
-    }
-}
-
-@Composable
-private fun InYourCitySection(
-    state: SearchUiState,
-    onNavigateToEventDetails: (id: String) -> Unit
-) {
-    SectionTitle(text = "In your city")
-
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp)
-    ) {
-        items(state.events.asReversed(), key = { it.id }) { event ->
-            EventCard(
-                event = event,
-                onEventClicked = { onNavigateToEventDetails(event.id) }
-            )
-        }
-    }
-    Spacer(modifier = Modifier.height(16.dp))
-}
-
-@Composable
-fun EventCard(event: ShortEventUiModel, onEventClicked: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .width(256.dp),
-        elevation = 4.dp,
-        shape = RoundedCornerShape(6.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    onClick = onEventClicked,
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = rememberRipple()
-                )
-        ) {
-            Image(
-                modifier = Modifier.fillMaxWidth(),
-                painter = painterResource(event.iconResourceId),
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth
-            )
-            Row(
-                modifier = Modifier
-                    .padding(top = 16.dp, start = 16.dp)
-            ) {
-                EventMetadata(metadata = event.dateTime)
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                EventMetadata(metadata = event.gamePoints)
-            }
-            Text(
-                fontFamily = eUkraineFontFamily,
-                text = event.name,
-                fontSize = 14.sp,
-                letterSpacing = 0.1.sp,
-                color = OnSurfacePrimary,
-                fontWeight = FontWeight.W500,
-                modifier = Modifier
-                    .padding(top = 16.dp, start = 16.dp)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                fontFamily = eUkraineFontFamily,
-                text = event.location,
-                fontSize = 12.sp,
-                letterSpacing = 0.4.sp,
-                color = OnSurfaceSecondary,
-                fontWeight = FontWeight.W300,
-                modifier = Modifier
-                    .padding(start = 16.dp)
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_user),
-                        modifier = Modifier.size(16.dp),
-                        contentScale = ContentScale.FillHeight,
-                        contentDescription = null
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        fontFamily = eUkraineFontFamily,
-                        text = event.volunteersCount,
-                        fontSize = 14.sp,
-                        color = OnSurfacePrimary,
-                        fontWeight = FontWeight.W400
-                    )
-                }
-            }
         }
     }
 }
@@ -415,5 +355,19 @@ fun DonationFundCard(iconId: Int, fundName: String) {
                 textAlign = TextAlign.Center
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun SearchScreenPreview() {
+    AppTheme {
+        SearchScreen(
+            state = SearchUiState(
+                isLoading = false,
+                events = listOf(previewEvent)
+            ),
+            onEventClicked = {}
+        )
     }
 }
