@@ -8,7 +8,7 @@ data class EventInfo(
     val curVolunteers: Int,
     val date: String,
     val desctiption: String,
-    val duties: String,
+    val duties: String?,
     val gamePoints: Int,
     val id: String,
     val isRegistered: Boolean,

@@ -1,9 +1,13 @@
 package com.lyft.android.interviewapp.ui.navigation
 
 object Screens {
-    const val searchScreen = "search"
     const val loginScreen = "login"
     const val onBoardingScreen = "onboarding"
+    const val homeScreen = "home"
+    const val searchScreen = "search"
+    const val myMissionsScreen = "myMissions"
+    const val achievementsScreen = "achievements"
+    const val profileScreen = "profile"
     const val eventDetailsScreen = "eventDetails"
 }
 
@@ -14,8 +18,13 @@ object NavArguments {
 
 object Routes {
     const val login = Screens.loginScreen
-    const val search = Screens.searchScreen
     const val onBoarding = "${Screens.onBoardingScreen}/{${NavArguments.userName}}"
+    const val searchNavigation = "search_nav"
+    const val search = Screens.searchScreen
+    const val home = Screens.homeScreen
+    const val myMissions = Screens.myMissionsScreen
+    const val achievements = Screens.achievementsScreen
+    const val profile = Screens.profileScreen
     const val eventDetails = "${Screens.eventDetailsScreen}/{${NavArguments.eventId}}"
 }
 

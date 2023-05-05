@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             AppTheme {
                 val startDestination =
-                    if (sharedPreferences.isSignedIn) Routes.search else Routes.login
+                    if (sharedPreferences.isSignedIn) Routes.home else Routes.login
                 AppNavHost(startDestination = startDestination)
             }
         }

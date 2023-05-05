@@ -30,7 +30,7 @@ fun EventDetailsResponse.mapToUiModel(): EventDetailsUiModel {
         donationsCount = donationsCount,
         organizer = eventInfo.organizer,
         description = eventInfo.desctiption,
-        duties = eventInfo.duties,
+        duties = eventInfo.duties.orEmpty(),
         isRegistered = eventInfo.isRegistered
     )
 }

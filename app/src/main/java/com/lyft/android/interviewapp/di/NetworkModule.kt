@@ -26,6 +26,7 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -66,6 +67,7 @@ abstract class NetworkModule {
             return OkHttpClient.Builder()
                 .apply {
                     interceptors.forEach(::addInterceptor)
+                    callTimeout(1L, TimeUnit.MINUTES)
                 }
                 .build()
         }

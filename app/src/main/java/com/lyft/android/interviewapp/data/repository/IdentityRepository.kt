@@ -11,7 +11,7 @@ class IdentityRepository @Inject constructor(
     private val identityApi: VolunteerIdentityApi
 ) {
     suspend fun isNewUser(): Boolean {
-        return true//identityApi.login(LoginRequest().toRequestBody()).isNewUser
+        return identityApi.login(LoginRequest().toRequestBody()).isNewUser
     }
 
     suspend fun createAccount(name: String, cityCode: Int) {

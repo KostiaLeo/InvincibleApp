@@ -15,11 +15,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.lyft.android.interviewapp.ui.screens.details.EventDetailsScreen
 import com.lyft.android.interviewapp.ui.screens.details.EventDetailsViewModel
+import com.lyft.android.interviewapp.ui.screens.home.HomeScreen
 import com.lyft.android.interviewapp.ui.screens.login.LoginScreen
 import com.lyft.android.interviewapp.ui.screens.login.LoginViewModel
 import com.lyft.android.interviewapp.ui.screens.onboarding.OnBoardingScreen
 import com.lyft.android.interviewapp.ui.screens.onboarding.OnBoardingViewModel
-import com.lyft.android.interviewapp.ui.screens.search.content.SearchScreen
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -47,7 +47,7 @@ fun AppNavHost(
                         println(graph)
                         navController.navigate(Navigation.onBoardingDestination(userName))
                     } else {
-                        navController.navigate(Routes.search)
+                        navController.navigate(Routes.home)
                     }
                 }
             )
@@ -65,15 +65,13 @@ fun AppNavHost(
                 onNameChanged = viewModel::onNameChanged,
                 onCitySelected = viewModel::onCitySelected,
                 onCreateAccountClicked = viewModel::createAccount,
-                onAccountCreated = { navController.navigate(Routes.search) },
+                onAccountCreated = { navController.navigate(Routes.home) },
                 onCloseClicked = navController::popBackStack
             )
         }
 
-        composable(
-            route = Routes.search
-        ) {
-            SearchScreen(
+        composable(Routes.home) {
+            HomeScreen(
                 onEventClicked = { eventId ->
                     navController.navigate(Navigation.eventDetailsDestination(eventId))
                 }
