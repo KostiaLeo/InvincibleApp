@@ -43,8 +43,6 @@ fun AppNavHost(
                 onAuthResult = viewModel::handleGoogleAccountTask,
                 onLoginCompleted = { isNewUser, userName ->
                     if (isNewUser) {
-                        val graph = navController.graph.nodes.toString()
-                        println(graph)
                         navController.navigate(Navigation.onBoardingDestination(userName))
                     } else {
                         navController.navigate(Routes.home)
@@ -88,7 +86,9 @@ fun AppNavHost(
             EventDetailsScreen(
                 state = state,
                 onRegisterClicked = viewModel::registerToEvent,
-                onGoBackClicked = navController::popBackStack
+                onGoBackClicked = navController::popBackStack,
+                onQrCodeClicked = {},
+                callOrganizerClicked = {},
             )
         }
     }

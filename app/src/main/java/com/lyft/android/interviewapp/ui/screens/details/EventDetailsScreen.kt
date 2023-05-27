@@ -1,104 +1,330 @@
 package com.lyft.android.interviewapp.ui.screens.details
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.lyft.android.interviewapp.R
 import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
+import com.lyft.android.interviewapp.data.repository.models.RegisterButtonConfigs
+import com.lyft.android.interviewapp.data.repository.models.RegistrationStatus
+import com.lyft.android.interviewapp.ui.screens.search.content.EventMetadata
 import com.lyft.android.interviewapp.ui.theme.AppTheme
-import com.lyft.android.interviewapp.ui.theme.PrimaryColor
+import com.lyft.android.interviewapp.ui.theme.HintTextColor
+import com.lyft.android.interviewapp.ui.theme.LightGrayBackgroundColor
+import com.lyft.android.interviewapp.ui.theme.TextColor
 
 @Composable
 fun EventDetailsScreen(
     state: PlaceDetailsUiState,
     onRegisterClicked: () -> Unit,
-    onGoBackClicked: () -> Unit
+    onGoBackClicked: () -> Unit,
+    onQrCodeClicked: () -> Unit,
+    callOrganizerClicked: () -> Unit
 ) {
     Scaffold(
         topBar = {
-            EventDetailsTopBar(state, onGoBackClicked)
+            EventDetailsTopBar(onGoBackClicked, onQrCodeClicked)
         },
         content = { paddingValues ->
-            Column(modifier = Modifier.padding(paddingValues)) {
-                Text(text = state.details.name, fontWeight = FontWeight.Bold)
-            }
+            EventDetailsContent(paddingValues, state, callOrganizerClicked)
         },
         bottomBar = {
-            EventDetailsBottomBar(onRegisterClicked)
+            EventDetailsBottomBar(state, onRegisterClicked)
         }
     )
 }
 
 @Composable
-fun EventDetailsTopBar(
+private fun EventDetailsContent(
+    paddingValues: PaddingValues,
     state: PlaceDetailsUiState,
-    onGoBackClicked: () -> Unit
+    callOrganizerClicked: () -> Unit
 ) {
-    TopAppBar(
-        backgroundColor = PrimaryColor,
-        contentColor = Color.White,
-        elevation = 0.dp
+    Column(
+        modifier = Modifier
+            .padding(paddingValues)
+            .padding(horizontal = 16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = null,
-                modifier = Modifier.clickable(onClick = onGoBackClicked)
+        Spacer(modifier = Modifier.height(24.dp))
+        Text(
+            text = state.details.name,
+            fontWeight = FontWeight.Bold,
+            fontSize = 24.sp
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        EventMetadata(address = state.details.location, dateTime = state.details.dateTime)
+        ContentDivider()
+        Text(
+            text = "Про місію",
+            fontWeight = FontWeight.W500,
+            fontSize = 14.sp
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        ExpandableText(
+            text = state.details.description,
+            minimizedMaxLines = 4,
+            style = TextStyle(
+                fontWeight = FontWeight.W300,
+                fontSize = 13.sp,
+                color = HintTextColor,
+                letterSpacing = 0.8.sp
             )
-            Text(text = state.details.organizer)
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+        )
+        ContentDivider()
+        Organizer(state.details, callOrganizerClicked)
+        ContentDivider()
+
+        Text(text = "Фотозвіт", fontWeight = FontWeight.W500, fontSize = 14.sp)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (state.details.photos.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(288.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(color = LightGrayBackgroundColor),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Фотозвіт буде завантажено організатором після завершення місії",
+                    fontWeight = FontWeight.W300,
+                    fontSize = 13.sp,
+                    color = HintTextColor,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 30.dp)
+                )
+            }
+        } else {
+            PhotosCarousel(state.details.photos)
+        }
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+// PhotosCarousel function that takes list of strings. load them from network and display them in lazy row with 8dp spacing between. each LazyRow item is image with 216x288dp size
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun PhotosCarousel(photos: List<String>) {
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(photos.size) { photoUrl ->
+            GlideImage(
+                modifier = Modifier
+                    .size(DpSize(216.dp, 288.dp))
+                    .background(color = LightGrayBackgroundColor),
+                model = photoUrl,
+                contentDescription = null
+            )
         }
     }
 }
 
 @Composable
+fun Organizer(
+    details: EventDetailsUiModel,
+    callOrganizerClicked: () -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column {
+            Text(
+                text = details.organizer,
+                fontWeight = FontWeight.W500,
+                fontSize = 14.sp
+            )
+            Text(
+                text = "Організатор",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.W300
+            )
+        }
+        Image(
+            modifier = Modifier
+                .background(
+                    color = LightGrayBackgroundColor,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(11.dp),
+            painter = painterResource(R.drawable.ic_phone),
+            contentDescription = null
+        )
+    }
+}
+
+@Composable
+fun ContentDivider() {
+    Spacer(modifier = Modifier.height(24.dp))
+    Divider()
+    Spacer(modifier = Modifier.height(24.dp))
+}
+
+@Composable
+fun ExpandableText(
+    modifier: Modifier = Modifier,
+    text: String,
+    minimizedMaxLines: Int,
+    style: TextStyle
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var hasVisualOverflow by remember { mutableStateOf(false) }
+    Box(modifier = modifier) {
+        Text(
+            text = text,
+            maxLines = if (expanded) Int.MAX_VALUE else minimizedMaxLines,
+            onTextLayout = { hasVisualOverflow = it.hasVisualOverflow },
+            style = style
+        )
+        if (hasVisualOverflow) {
+            Row(
+                modifier = Modifier.align(Alignment.BottomEnd),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                val lineHeightDp: Dp = with(LocalDensity.current) { style.lineHeight.toDp() }
+                Spacer(
+                    modifier = Modifier
+                        .width(48.dp)
+                        .height(lineHeightDp)
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(Color.Transparent, Color.White)
+                            )
+                        )
+                )
+                Text(
+                    modifier = Modifier
+                        .background(Color.White)
+                        .padding(start = 4.dp)
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() },
+                            onClick = { expanded = !expanded }
+                        ),
+                    text = "Show More",
+                    color = MaterialTheme.colors.primary,
+                    style = style
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun EventDetailsTopBar(
+    onGoBackClicked: () -> Unit,
+    onQrCodeClicked: () -> Unit
+) {
+    TopAppBar(
+        backgroundColor = Color.White,
+        contentColor = TextColor,
+        title = {
+            Text(text = "Пошук", fontSize = 14.sp, fontWeight = FontWeight.W500)
+        },
+        navigationIcon = {
+            IconButton(onClick = onGoBackClicked) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = null
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onQrCodeClicked) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_qr_code),
+                    contentDescription = "QR code",
+                    tint = TextColor
+                )
+            }
+        }
+    )
+}
+
+@Composable
 fun EventDetailsBottomBar(
+    state: PlaceDetailsUiState,
     onRegisterClicked: () -> Unit
 ) {
-    BottomAppBar(
-        backgroundColor = Color.White
-    ) {
+    Column {
+        Divider()
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .padding(horizontal = 12.dp)
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_user),
+                    tint = TextColor,
+                    contentDescription = null
+                )
+                Text(
+                    text = state.details.volunteersCount,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.W500
+                )
+            }
+
+            val configs =
+                RegisterButtonConfigs.fromRegistrationStatus(state.details.registrationStatus)
             Button(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.size(200.dp, 48.dp),
                 shape = RoundedCornerShape(6.dp),
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = PrimaryColor,
+                    backgroundColor = configs.color,
                     contentColor = Color.White
                 ),
+                enabled = configs.clickable,
                 onClick = onRegisterClicked
             ) {
-                Text(text = "Register")
-            }
-            Button(
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(6.dp),
-                border = BorderStroke(1.dp, PrimaryColor),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.White,
-                    contentColor = PrimaryColor
-                ),
-                onClick = { /*TODO*/ }
-            ) {
-                Text(text = "Make a donation")
+                Text(
+                    text = configs.text,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.W500
+                )
             }
         }
     }
@@ -112,12 +338,20 @@ fun EventDetailsScreenPreview() {
             state = PlaceDetailsUiState(
                 details = EventDetailsUiModel(
                     name = "Event name",
-                    organizer = "Kostia"
+                    organizer = "Kostia",
+                    location = "Vinnytsia",
+                    dateTime = "12:00 - 14:00 • 24 Травня 2023",
+                    description = "Волонтерська місія зосереджена на розчищенні доріг від уламків та завалів після ракетного обстрілу. Однією з наших найважливіших метою є відновлення"
+                        .repeat(2),
+                    volunteersCount = "12/50",
+                    registrationStatus = RegistrationStatus.AVAILABLE
                 ),
                 isLoading = false
             ),
             onRegisterClicked = {},
-            onGoBackClicked = {}
+            onGoBackClicked = {},
+            onQrCodeClicked = {},
+            callOrganizerClicked = {}
         )
     }
 }

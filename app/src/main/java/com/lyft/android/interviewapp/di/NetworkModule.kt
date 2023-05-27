@@ -68,6 +68,9 @@ abstract class NetworkModule {
                 .apply {
                     interceptors.forEach(::addInterceptor)
                     callTimeout(1L, TimeUnit.MINUTES)
+                    connectTimeout(1L, TimeUnit.MINUTES)
+                    readTimeout(1L, TimeUnit.MINUTES)
+                    writeTimeout(1L, TimeUnit.MINUTES)
                 }
                 .build()
         }

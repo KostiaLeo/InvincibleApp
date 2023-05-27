@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lyft.android.interviewapp.data.repository.VolunteerEventsRepository
 import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
+import com.lyft.android.interviewapp.data.repository.models.RegistrationStatus
 import com.lyft.android.interviewapp.ui.navigation.NavArguments
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -48,9 +49,9 @@ class EventDetailsViewModel @Inject constructor(
                 it.copy(
                     isLoading = false,
                     details = it.details.copy(
-                        isRegistered = true,
+                        registrationStatus = RegistrationStatus.REGISTERED,
                         volunteersCount = it.details.volunteersCount
-                            .replaceBefore('/', registerResponse.newCurVolunteersCount.toString()) // very bad but idc ;)
+                            .replaceBefore('/', registerResponse.newCurVolunteersCount.toString())
                     )
                 )
             }

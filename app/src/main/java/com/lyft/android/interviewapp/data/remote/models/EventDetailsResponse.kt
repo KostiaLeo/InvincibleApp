@@ -5,18 +5,14 @@ data class EventDetailsResponse(
 )
 
 data class EventInfo(
-    val curVolunteers: Int,
-    val date: String,
     val desctiption: String,
     val duties: String?,
-    val gamePoints: Int,
     val id: String,
-    val isRegistered: Boolean,
-    val location: String,
-    val maxVolunteers: Int,
-    val moneyDonated: Int,
-    val moneyNeeded: Int,
     val name: String,
-    val organizer: String,
-    val type: Int
+    val location: String,
+    val date: String,
+    val type: Int,
+    val curVolunteers: Int,
+    val maxVolunteers: Int,
+    val organizer: String?,
 )

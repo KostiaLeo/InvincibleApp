@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "36027353369",
+    "project_id": "invincible-6d539",
+    "storage_bucket": "invincible-6d539.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:36027353369:android:d0d06c0e682366328add88",
+        "android_client_info": {
+          "package_name": "com.lyft.android.interviewapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "36027353369-3p0o9je5tisqgv2ks2m5pjehk7bh0c15.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_tHKIIo-1yPOulzzX8EFZCRvefNRGoxg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "36027353369-3p0o9je5tisqgv2ks2m5pjehk7bh0c15.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

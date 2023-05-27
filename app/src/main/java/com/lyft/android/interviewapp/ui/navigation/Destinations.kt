@@ -19,7 +19,6 @@ object NavArguments {
 object Routes {
     const val login = Screens.loginScreen
     const val onBoarding = "${Screens.onBoardingScreen}/{${NavArguments.userName}}"
-    const val searchNavigation = "search_nav"
     const val search = Screens.searchScreen
     const val home = Screens.homeScreen
     const val myMissions = Screens.myMissionsScreen

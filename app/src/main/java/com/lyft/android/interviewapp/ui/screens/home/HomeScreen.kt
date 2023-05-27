@@ -21,7 +21,6 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.*
 import com.lyft.android.interviewapp.R
 import com.lyft.android.interviewapp.ui.navigation.Routes
@@ -30,6 +29,7 @@ import com.lyft.android.interviewapp.ui.screens.search.content.SearchScreen
 import com.lyft.android.interviewapp.ui.theme.PrimaryColor
 import com.lyft.android.interviewapp.ui.theme.TextColor
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
     val context = LocalContext.current
@@ -53,9 +53,7 @@ fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
     val bottomNavController = rememberNavController()
     Scaffold(
         bottomBar = {
-            BottomNavigation(
-                backgroundColor = Color.White
-            ) {
+            BottomNavigation(backgroundColor = Color.White) {
                 val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
                 items.forEach { screen ->
@@ -63,7 +61,6 @@ fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
                         currentDestination?.hierarchy?.any { it.route == screen.route } == true
                     }
                     val tabContentColor by animateColorAsState(if (selected) PrimaryColor else TextColor)
-
                     BottomNavigationItem(
                         icon = {
                             Icon(
@@ -100,7 +97,19 @@ fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
             startDestination = HomeTabScreen.Search.route,
             Modifier.padding(innerPadding)
         ) {
-            searchEventsGraph(onEventClicked)
+            composable(
+                route = HomeTabScreen.Search.route
+            ) {
+                val viewModel = hiltViewModel<SearchViewModel>()
+                val state by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+                SearchScreen(
+                    state = state,
+                    onEventClicked = onEventClicked,
+                    onFilterSelected = viewModel::onFilterSelected,
+                    onQrCodeClicked = {},
+                    onCitySelected = viewModel::onCitySelected
+                )
+            }
 
             composable(HomeTabScreen.MyMissions.route) {
                 Text(text = "My Missions")
@@ -115,29 +124,12 @@ fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
-private fun NavGraphBuilder.searchEventsGraph(
-    onEventClicked: (eventId: String) -> Unit
-) {
-    navigation(route = HomeTabScreen.Search.route, startDestination = Routes.search) {
-        composable(
-            route = Routes.search
-        ) {
-            val state by hiltViewModel<SearchViewModel>().uiStateFlow.collectAsStateWithLifecycle()
-            SearchScreen(
-                state = state,
-                onEventClicked = onEventClicked
-            )
-        }
-    }
-}
-
 sealed class HomeTabScreen(
     val route: String,
     val tabName: String,
     @DrawableRes val iconResId: Int
 ) {
-    object Search : HomeTabScreen(Routes.searchNavigation, "Пошук", R.drawable.ic_search)
+    object Search : HomeTabScreen(Routes.search, "Пошук", R.drawable.ic_search)
     object MyMissions : HomeTabScreen(Routes.myMissions, "Мої місії", R.drawable.ic_my_missions)
     object Achievements :
         HomeTabScreen(Routes.achievements, "Досягнення", R.drawable.ic_achievements)

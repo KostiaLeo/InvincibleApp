@@ -1,7 +1,6 @@
 package com.lyft.android.interviewapp.data.network
 
 import android.content.SharedPreferences
-import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.lyft.android.interviewapp.di.idToken
 import java.util.concurrent.CountDownLatch
@@ -26,9 +25,7 @@ class GoogleTokenProvider @Inject constructor(
         googleSignInClient.silentSignIn()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    sharedPreferences.idToken = task.result.idToken.also {
-                        Log.d("GoogleSignIn", "New token: $it")
-                    }
+                    sharedPreferences.idToken = task.result.idToken
                 }
                 countDownLatch.countDown()
             }
