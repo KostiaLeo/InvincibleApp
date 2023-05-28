@@ -23,6 +23,7 @@ import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -33,6 +34,8 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,8 +55,8 @@ import androidx.compose.ui.unit.sp
 import com.lyft.android.interviewapp.ui.theme.AppTheme
 import com.lyft.android.interviewapp.ui.theme.LightGrayBackgroundColor
 import com.lyft.android.interviewapp.ui.theme.PrimaryColor
-import com.lyft.android.interviewapp.ui.tools.LoadingOverlay
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OnBoardingScreen(
     state: OnBoardingUiState,
@@ -71,63 +74,65 @@ fun OnBoardingScreen(
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
     }
-    LoadingOverlay(show = state.showProgress) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    backgroundColor = Color.White,
-                    navigationIcon = {
-                        Row {
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = null,
-                                modifier = Modifier.clickable(onClick = onCloseClicked)
-                            )
-                        }
-                    },
-                    title = {}
-                )
-            },
-            content = { paddingValues ->
-                Column(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .padding(start = 16.dp, end = 16.dp, top = 8.dp)
-                ) {
-                    Text(text = "Створити акаунт", fontWeight = FontWeight.W500, fontSize = 24.sp)
-                    Spacer(modifier = Modifier.height(32.dp))
-                    NameInput(state, onNameChanged)
-                    Spacer(modifier = Modifier.height(24.dp))
-                    CitySelector(state, onCitySelected)
-                }
-            },
-            bottomBar = {
-                BottomAppBar(
-                    elevation = 0.dp,
-                    backgroundColor = Color.White,
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                ) {
-                    Button(
-                        enabled = state.isReadyToRegister,
-                        modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(vertical = 12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = PrimaryColor,
-                            contentColor = Color.White
-                        ),
-                        onClick = onCreateAccountClicked
-                    ) {
-                        Text(
-                            text = "Створити акаунт",
-                            fontWeight = FontWeight.W500,
-                            fontSize = 14.sp
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                backgroundColor = Color.White,
+                navigationIcon = {
+                    Row {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = null,
+                            modifier = Modifier.clickable(onClick = onCloseClicked)
                         )
                     }
+                },
+                title = {}
+            )
+        },
+        content = { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .padding(start = 16.dp, end = 16.dp, top = 8.dp)
+                    .pullRefresh(
+                        state = rememberPullRefreshState(state.showProgress, onRefresh = {}),
+                        enabled = false
+                    )
+            ) {
+                Text(text = "Створити акаунт", fontWeight = FontWeight.W500, fontSize = 24.sp)
+                Spacer(modifier = Modifier.height(32.dp))
+                NameInput(state, onNameChanged)
+                Spacer(modifier = Modifier.height(24.dp))
+                CitySelector(state, onCitySelected)
+            }
+        },
+        bottomBar = {
+            BottomAppBar(
+                elevation = 0.dp,
+                backgroundColor = Color.White,
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
+            ) {
+                Button(
+                    enabled = state.isReadyToRegister && !state.showProgress,
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(vertical = 12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = PrimaryColor,
+                        contentColor = Color.White
+                    ),
+                    onClick = onCreateAccountClicked
+                ) {
+                    Text(
+                        text = "Створити акаунт",
+                        fontWeight = FontWeight.W500,
+                        fontSize = 14.sp
+                    )
                 }
             }
-        )
-    }
+        }
+    )
 
     if (state.isAccountCreated) {
         LaunchedEffect(Unit) {

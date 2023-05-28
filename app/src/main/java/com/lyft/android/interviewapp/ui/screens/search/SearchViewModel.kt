@@ -7,6 +7,7 @@ import com.lyft.android.interviewapp.data.repository.VolunteerEventsRepository
 import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel
 import com.lyft.android.interviewapp.ui.screens.onboarding.Cities
 import com.lyft.android.interviewapp.ui.screens.onboarding.City
+import com.lyft.android.interviewapp.ui.screens.qrcode.QrCodeScannedUseCase
 import com.lyft.android.interviewapp.ui.screens.search.content.EventFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -18,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val repository: VolunteerEventsRepository
+    private val repository: VolunteerEventsRepository,
+    private val qrCodeScannedUseCase: QrCodeScannedUseCase
 ) : ViewModel() {
     private val _uiStateFlow = MutableStateFlow(SearchUiState())
     val uiStateFlow = _uiStateFlow.asStateFlow()
@@ -62,6 +64,12 @@ class SearchViewModel @Inject constructor(
         viewModelScope.launch {
             _uiStateFlow.update { it.copy(selectedCity = city) }
             // TODO: load filtered events
+        }
+    }
+
+    fun onQrCodeScanned(result: String?) {
+        viewModelScope.launch(exceptionHandler) {
+            qrCodeScannedUseCase(result)
         }
     }
 }

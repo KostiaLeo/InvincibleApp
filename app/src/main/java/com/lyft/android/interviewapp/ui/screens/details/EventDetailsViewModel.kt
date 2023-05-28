@@ -8,6 +8,7 @@ import com.lyft.android.interviewapp.data.repository.VolunteerEventsRepository
 import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
 import com.lyft.android.interviewapp.data.repository.models.RegistrationStatus
 import com.lyft.android.interviewapp.ui.navigation.NavArguments
+import com.lyft.android.interviewapp.ui.screens.qrcode.QrCodeScannedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class EventDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: VolunteerEventsRepository
+    private val repository: VolunteerEventsRepository,
+    private val qrCodeScannedUseCase: QrCodeScannedUseCase
 ) : ViewModel() {
     private val _uiStateFlow = MutableStateFlow(PlaceDetailsUiState())
     val uiStateFlow = _uiStateFlow.asStateFlow()
@@ -58,9 +60,20 @@ class EventDetailsViewModel @Inject constructor(
         }
     }
 
+    fun onQrCodeScanned(result: String?) {
+        viewModelScope.launch(exceptionHandler) {
+            qrCodeScannedUseCase(result)
+        }
+    }
+
     private fun handleError(throwable: Throwable) {
         Log.e("ERROR_EVENT_DETAILS", throwable.localizedMessage, throwable)
-        _uiStateFlow.update { it.copy(isLoading = false, errorMessage = throwable.localizedMessage) }
+        _uiStateFlow.update {
+            it.copy(
+                isLoading = false,
+                errorMessage = throwable.localizedMessage
+            )
+        }
     }
 
     fun onErrorMessageShown() {

@@ -1,11 +1,11 @@
 package com.lyft.android.interviewapp.ui.navigation
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -20,8 +20,8 @@ import com.lyft.android.interviewapp.ui.screens.login.LoginScreen
 import com.lyft.android.interviewapp.ui.screens.login.LoginViewModel
 import com.lyft.android.interviewapp.ui.screens.onboarding.OnBoardingScreen
 import com.lyft.android.interviewapp.ui.screens.onboarding.OnBoardingViewModel
+import com.lyft.android.interviewapp.ui.screens.qrcode.QrCodeActivityResultContract
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
@@ -83,11 +83,18 @@ fun AppNavHost(
             val viewModel: EventDetailsViewModel = hiltViewModel()
             val state by viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
+            val qrCodeLauncher = rememberLauncherForActivityResult(
+                contract = QrCodeActivityResultContract,
+                onResult = viewModel::onQrCodeScanned
+            )
+
             EventDetailsScreen(
                 state = state,
                 onRegisterClicked = viewModel::registerToEvent,
                 onGoBackClicked = navController::popBackStack,
-                onQrCodeClicked = {},
+                onQrCodeClicked = {
+                    qrCodeLauncher.launch(Unit)
+                },
                 callOrganizerClicked = {},
             )
         }

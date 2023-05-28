@@ -50,6 +50,7 @@ fun EventCard(event: ShortEventUiModel, onEventClicked: () -> Unit) {
                     indication = rememberRipple()
                 )
                 .padding(all = 16.dp)
+                .padding(bottom = 4.dp)
         ) {
             Text(
                 fontFamily = eUkraineFontFamily,
@@ -64,7 +65,7 @@ fun EventCard(event: ShortEventUiModel, onEventClicked: () -> Unit) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp),
+                    .padding(top = 20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(

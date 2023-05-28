@@ -1,11 +1,16 @@
 package com.lyft.android.interviewapp.ui.screens.home
 
 import android.view.View
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Icon
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,19 +22,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.lyft.android.interviewapp.R
 import com.lyft.android.interviewapp.ui.navigation.Routes
+import com.lyft.android.interviewapp.ui.screens.qrcode.QrCodeActivityResultContract
 import com.lyft.android.interviewapp.ui.screens.search.SearchViewModel
 import com.lyft.android.interviewapp.ui.screens.search.content.SearchScreen
 import com.lyft.android.interviewapp.ui.theme.PrimaryColor
 import com.lyft.android.interviewapp.ui.theme.TextColor
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
     val context = LocalContext.current
@@ -102,11 +109,19 @@ fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
             ) {
                 val viewModel = hiltViewModel<SearchViewModel>()
                 val state by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+
+                val qrCodeLauncher = rememberLauncherForActivityResult(
+                    contract = QrCodeActivityResultContract,
+                    onResult = viewModel::onQrCodeScanned
+                )
+
                 SearchScreen(
                     state = state,
                     onEventClicked = onEventClicked,
                     onFilterSelected = viewModel::onFilterSelected,
-                    onQrCodeClicked = {},
+                    onQrCodeClicked = {
+                        qrCodeLauncher.launch(Unit)
+                    },
                     onCitySelected = viewModel::onCitySelected
                 )
             }

@@ -9,6 +9,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +25,7 @@ import com.lyft.android.interviewapp.ui.screens.onboarding.City
 import com.lyft.android.interviewapp.ui.screens.search.SearchUiState
 import com.lyft.android.interviewapp.ui.theme.*
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchScreen(
     state: SearchUiState,
@@ -36,50 +39,82 @@ fun SearchScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        Surface(elevation = 4.dp) {
-            Column {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White)
-                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+        SearchScreenTopBar(state, onCitySelected, onQrCodeClicked, onFilterSelected)
+
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .background(LightGrayBackgroundColor)
+                .pullRefresh(
+                    state = rememberPullRefreshState(state.isLoading, onRefresh = {}),
+                    enabled = false
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            if (state.events.isEmpty()) {
+                Text(
+                    text = "Місій не знайдено",
+                    color = HintTextColor,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.W300
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-
-                    CitySelector(state, onCitySelected)
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    IconButton(onClick = onQrCodeClicked) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_qr_code),
-                            contentDescription = "QR code",
-                            tint = TextColor
+                    items(state.events) { event ->
+                        EventCard(
+                            event = event,
+                            onEventClicked = {
+                                onEventClicked(event.id)
+                            }
                         )
                     }
                 }
-
-                FiltersSelector(
-                    filters = state.availableFilters,
-                    onFilterSelected = onFilterSelected
-                )
             }
         }
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Add your items to the list here
-            items(state.events) { event ->
-                EventCard(
-                    event = event,
-                    onEventClicked = {
-                        onEventClicked(event.id)
-                    }
-                )
+
+    }
+}
+
+@Composable
+private fun SearchScreenTopBar(
+    state: SearchUiState,
+    onCitySelected: (city: City) -> Unit,
+    onQrCodeClicked: () -> Unit,
+    onFilterSelected: (filter: EventFilter) -> Unit
+) {
+    Surface(elevation = 8.dp) {
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                CitySelector(state, onCitySelected)
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                IconButton(onClick = onQrCodeClicked) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_qr_code),
+                        contentDescription = "QR code",
+                        tint = TextColor
+                    )
+                }
             }
+
+            FiltersSelector(
+                filters = state.availableFilters,
+                onFilterSelected = onFilterSelected
+            )
         }
     }
 }

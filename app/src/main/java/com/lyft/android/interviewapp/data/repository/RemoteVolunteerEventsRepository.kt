@@ -18,11 +18,17 @@ class RemoteVolunteerEventsRepository @Inject constructor(
         volunteerEventsApi.getAllEvents().events.map { it.mapToUiModel() }
     }
 
-    override suspend fun registerForEvent(eventId: String): RegisterForEventResponse = withContext(dispatcherProvider.io) {
-        volunteerEventsApi.registerForEvent(eventId)
-    }
+    override suspend fun registerForEvent(eventId: String): RegisterForEventResponse =
+        withContext(dispatcherProvider.io) {
+            volunteerEventsApi.registerForEvent(eventId)
+        }
 
-    override suspend fun getEventDetails(id: String): EventDetailsUiModel = withContext(dispatcherProvider.io) {
-        volunteerEventsApi.getEventDetails(id).mapToUiModel()
+    override suspend fun getEventDetails(id: String): EventDetailsUiModel =
+        withContext(dispatcherProvider.io) {
+            volunteerEventsApi.getEventDetails(id).mapToUiModel()
+        }
+
+    override suspend fun confirmPresence(eventId: String) {
+        // TODO("Not yet implemented")
     }
 }
