@@ -31,9 +31,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.lyft.android.interviewapp.R
 import com.lyft.android.interviewapp.ui.navigation.Routes
+import com.lyft.android.interviewapp.ui.screens.home.achievements.AchievementsScreen
+import com.lyft.android.interviewapp.ui.screens.home.achievements.AchievementsViewModel
+import com.lyft.android.interviewapp.ui.screens.home.mymissions.MyMissionsScreen
+import com.lyft.android.interviewapp.ui.screens.home.mymissions.MyMissionsViewModel
+import com.lyft.android.interviewapp.ui.screens.home.search.SearchViewModel
+import com.lyft.android.interviewapp.ui.screens.home.search.content.SearchScreen
 import com.lyft.android.interviewapp.ui.screens.qrcode.QrCodeActivityResultContract
-import com.lyft.android.interviewapp.ui.screens.search.SearchViewModel
-import com.lyft.android.interviewapp.ui.screens.search.content.SearchScreen
 import com.lyft.android.interviewapp.ui.theme.PrimaryColor
 import com.lyft.android.interviewapp.ui.theme.TextColor
 
@@ -47,6 +51,12 @@ fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
     }
+
+    val homeViewModel = hiltViewModel<HomeScreenViewModel>()
+    val qrCodeLauncher = rememberLauncherForActivityResult(
+        contract = QrCodeActivityResultContract,
+        onResult = homeViewModel::onQrCodeScanned
+    )
 
     val items = remember {
         listOf(
@@ -110,11 +120,6 @@ fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
                 val viewModel = hiltViewModel<SearchViewModel>()
                 val state by viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
-                val qrCodeLauncher = rememberLauncherForActivityResult(
-                    contract = QrCodeActivityResultContract,
-                    onResult = viewModel::onQrCodeScanned
-                )
-
                 SearchScreen(
                     state = state,
                     onEventClicked = onEventClicked,
@@ -127,10 +132,24 @@ fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
             }
 
             composable(HomeTabScreen.MyMissions.route) {
-                Text(text = "My Missions")
+                val viewModel = hiltViewModel<MyMissionsViewModel>()
+                val state by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+
+                MyMissionsScreen(
+                    state = state,
+                    onEventClicked = onEventClicked,
+                    onFilterSelected = viewModel::onFilterSelected,
+                    onQrCodeClicked = {
+                        qrCodeLauncher.launch(Unit)
+                    }
+                )
             }
             composable(HomeTabScreen.Achievements.route) {
-                Text(text = "Achievements")
+                val viewModel = hiltViewModel<AchievementsViewModel>()
+                AchievementsScreen(
+                    viewModel.uiState,
+                    onQrCodeClicked = { qrCodeLauncher.launch(Unit) }
+                )
             }
             composable(HomeTabScreen.Profile.route) {
                 Text(text = "Profile")
@@ -148,5 +167,6 @@ sealed class HomeTabScreen(
     object MyMissions : HomeTabScreen(Routes.myMissions, "Мої місії", R.drawable.ic_my_missions)
     object Achievements :
         HomeTabScreen(Routes.achievements, "Досягнення", R.drawable.ic_achievements)
+
     object Profile : HomeTabScreen(Routes.profile, "Профіль", R.drawable.ic_profile)
 }

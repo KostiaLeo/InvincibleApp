@@ -8,12 +8,12 @@ import com.google.android.gms.tasks.Task
 import com.lyft.android.interviewapp.data.repository.IdentityRepository
 import com.lyft.android.interviewapp.di.idToken
 import com.lyft.android.interviewapp.di.isSignedIn
-import com.lyft.android.interviewapp.utils.await
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel

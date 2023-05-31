@@ -38,7 +38,7 @@ import com.lyft.android.interviewapp.R
 import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
 import com.lyft.android.interviewapp.data.repository.models.RegisterButtonConfigs
 import com.lyft.android.interviewapp.data.repository.models.RegistrationStatus
-import com.lyft.android.interviewapp.ui.screens.search.content.EventMetadata
+import com.lyft.android.interviewapp.ui.screens.home.search.content.EventMetadata
 import com.lyft.android.interviewapp.ui.theme.AppTheme
 import com.lyft.android.interviewapp.ui.theme.HintTextColor
 import com.lyft.android.interviewapp.ui.theme.LightGrayBackgroundColor

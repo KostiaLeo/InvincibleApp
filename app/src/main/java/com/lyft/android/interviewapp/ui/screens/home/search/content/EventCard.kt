@@ -1,4 +1,4 @@
-package com.lyft.android.interviewapp.ui.screens.search.content
+package com.lyft.android.interviewapp.ui.screens.home.search.content
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image

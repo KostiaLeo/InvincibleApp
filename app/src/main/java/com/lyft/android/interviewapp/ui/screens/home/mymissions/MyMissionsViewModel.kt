@@ -1,14 +1,11 @@
-package com.lyft.android.interviewapp.ui.screens.search
+package com.lyft.android.interviewapp.ui.screens.home.mymissions
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lyft.android.interviewapp.data.repository.VolunteerEventsRepository
 import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel
-import com.lyft.android.interviewapp.ui.screens.onboarding.Cities
-import com.lyft.android.interviewapp.ui.screens.onboarding.City
-import com.lyft.android.interviewapp.ui.screens.qrcode.QrCodeScannedUseCase
-import com.lyft.android.interviewapp.ui.screens.search.content.EventFilter
+import com.lyft.android.interviewapp.utils.EventFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,15 +15,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SearchViewModel @Inject constructor(
-    private val repository: VolunteerEventsRepository,
-    private val qrCodeScannedUseCase: QrCodeScannedUseCase
+class MyMissionsViewModel @Inject constructor(
+    private val repository: VolunteerEventsRepository
 ) : ViewModel() {
-    private val _uiStateFlow = MutableStateFlow(SearchUiState())
+    private val _uiStateFlow = MutableStateFlow(MyMissionsUiState())
     val uiStateFlow = _uiStateFlow.asStateFlow()
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Log.e("ERROR_ALL_EVENTS", throwable.localizedMessage, throwable)
+        Log.e("ERROR_MY_EVENTS", throwable.localizedMessage, throwable)
         _uiStateFlow.update {
             it.copy(
                 isLoading = false,
@@ -41,7 +37,7 @@ class SearchViewModel @Inject constructor(
 
     private fun loadEvents() {
         viewModelScope.launch(exceptionHandler) {
-            val events = repository.getAllEvents()
+            val events = repository.getMyMissionsList()
             _uiStateFlow.update { it.copy(isLoading = false, events = events) }
         }
     }
@@ -59,37 +55,19 @@ class SearchViewModel @Inject constructor(
             }
         }
     }
-
-    fun onCitySelected(city: City) {
-        viewModelScope.launch {
-            _uiStateFlow.update { it.copy(selectedCity = city) }
-            // TODO: load filtered events
-        }
-    }
-
-    fun onQrCodeScanned(result: String?) {
-        viewModelScope.launch(exceptionHandler) {
-            qrCodeScannedUseCase(result)
-        }
-    }
 }
 
-data class SearchUiState(
+data class MyMissionsUiState(
     val isLoading: Boolean = true,
     val events: List<ShortEventUiModel> = emptyList(),
     val errorMessage: String? = null,
-    val allFilters: List<EventFilter> = defaultFilters,
-    val availableFilters: List<EventFilter> = allFilters,
-    val cities: List<City> = Cities(),
-    val selectedCity: City? = cities.firstOrNull()
-
+    val allFilters: List<EventFilter> = myMissionsFilters,
+    val availableFilters: List<EventFilter> = allFilters
 )
 
-private val defaultFilters by lazy {
+private val myMissionsFilters by lazy {
     listOf(
-        EventFilter("Цього тижня", false, 0),
-        EventFilter("Цього місяця", false, 1),
-        EventFilter("1-2 год", false, 2),
-        EventFilter("3-4 год", false, 3),
+        EventFilter("Активні", false, 0),
+        EventFilter("Завершені", false, 1),
     )
 }

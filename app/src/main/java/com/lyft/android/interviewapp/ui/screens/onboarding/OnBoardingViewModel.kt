@@ -83,8 +83,8 @@ data class City(
 object Cities {
     operator fun invoke(): List<City> {
         return listOf(
-            "Vinnytsia" of 0,
-            "Kyiv" of 1
+            "Вінниця" of 0,
+            "Київ" of 1
         )
     }
 

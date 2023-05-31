@@ -1,6 +1,6 @@
 package com.lyft.android.interviewapp.data.remote.models
 
-data class AllEventsApiResponse(
+data class EventsListApiResponse(
     val events: List<ShortEvent>
 )
 
