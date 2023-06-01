@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lyft.android.interviewapp.data.repository.VolunteerEventsRepository
 import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
-import com.lyft.android.interviewapp.data.repository.models.RegistrationStatus
 import com.lyft.android.interviewapp.ui.navigation.NavArguments
 import com.lyft.android.interviewapp.ui.screens.qrcode.QrCodeScannedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +26,7 @@ class EventDetailsViewModel @Inject constructor(
     val uiStateFlow = _uiStateFlow.asStateFlow()
 
     private val eventId: String by lazy { savedStateHandle[NavArguments.eventId]!! }
+    private val confirmUser: Boolean by lazy { savedStateHandle[NavArguments.confirmUser]!! }
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         handleError(throwable)
@@ -38,25 +38,39 @@ class EventDetailsViewModel @Inject constructor(
 
     private fun loadEvent() {
         viewModelScope.launch(exceptionHandler) {
+            refresh()
+            if (confirmUser) {
+                launch {
+                    repository.confirmPresence(eventId)
+                    _uiStateFlow.update {
+                        it.copy(
+                            isLoading = false,
+                            showConfirmedMessage = true
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch(exceptionHandler) {
+            _uiStateFlow.update { it.copy(isLoading = true) }
             val eventDetails = repository.getEventDetails(eventId)
-            _uiStateFlow.update { it.copy(isLoading = false, details = eventDetails) }
+            _uiStateFlow.update {
+                it.copy(
+                    isLoading = false,
+                    details = eventDetails
+                )
+            }
         }
     }
 
     fun registerToEvent() {
         viewModelScope.launch(exceptionHandler) {
             _uiStateFlow.update { it.copy(isLoading = true) }
-            val registerResponse = repository.registerForEvent(eventId)
-            _uiStateFlow.update {
-                it.copy(
-                    isLoading = false,
-                    details = it.details.copy(
-                        registrationStatus = RegistrationStatus.REGISTERED,
-                        volunteersCount = it.details.volunteersCount
-                            .replaceBefore('/', registerResponse.newCurVolunteersCount.toString())
-                    )
-                )
-            }
+            repository.registerForEvent(eventId)
+            refresh()
         }
     }
 
@@ -75,14 +89,11 @@ class EventDetailsViewModel @Inject constructor(
             )
         }
     }
-
-    fun onErrorMessageShown() {
-        _uiStateFlow.update { it.copy(errorMessage = null) }
-    }
 }
 
 data class PlaceDetailsUiState(
     val details: EventDetailsUiModel = EventDetailsUiModel(),
     val isLoading: Boolean = true,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val showConfirmedMessage: Boolean = false
 )

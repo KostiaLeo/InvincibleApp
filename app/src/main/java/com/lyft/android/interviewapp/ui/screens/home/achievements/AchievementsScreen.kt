@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalGlideComposeApi::class)
+@file:OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterialApi::class)
 
 package com.lyft.android.interviewapp.ui.screens.home.achievements
 
@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
@@ -25,6 +26,9 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -56,6 +60,7 @@ import com.lyft.android.interviewapp.utils.dashedBorder
 fun AchievementsScreen(
     state: AchievementsUiState,
     onQrCodeClicked: () -> Unit,
+    onRefresh: () -> Unit
 ) {
     Scaffold(topBar = {
         TopAppBar(
@@ -75,21 +80,41 @@ fun AchievementsScreen(
             }
         )
     }) { contentPaddings ->
-        LazyColumn(
+        val pullRefreshState = rememberPullRefreshState(
+            refreshing = state.isLoading,
+            onRefresh = onRefresh
+        )
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(contentPaddings),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp)
+                .padding(contentPaddings)
+                .pullRefresh(state = pullRefreshState)
         ) {
-            item {
-                Level(state)
-                Spacer(modifier = Modifier.height(24.dp))
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 24.dp,
+                    bottom = 16.dp
+                )
+            ) {
+                item {
+                    Level(state)
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+                statistics(state.statistics)
+                item {
+                    Spacer(modifier = Modifier.height(40.dp))
+                }
+                puzzlesCollection(state.puzzlesCollection)
             }
-            statistics(state.statistics)
-            item {
-                Spacer(modifier = Modifier.height(40.dp))
-            }
-            puzzlesCollection(state.puzzlesCollection)
+
+            PullRefreshIndicator(
+                refreshing = state.isLoading,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
     }
 }
@@ -438,7 +463,8 @@ fun AchievementsScreenPreview() {
                     PuzzleCollectionItem.EmptySlot, PuzzleCollectionItem.Footer,
                 )
             ),
-            onQrCodeClicked = {}
+            onQrCodeClicked = {},
+            onRefresh = {}
         )
     }
 }

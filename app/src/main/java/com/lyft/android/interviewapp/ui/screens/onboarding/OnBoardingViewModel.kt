@@ -21,6 +21,9 @@ class OnBoardingViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+    private val displayMode = savedStateHandle.get<String>(NavArguments.displayMode)
+        ?.let { DisplayMode.valueOf(it) } ?: DisplayMode.CREATE_ACCOUNT
+
     private val nameStateFlow = MutableStateFlow(
         savedStateHandle.get<String>(NavArguments.userName).orEmpty()
     )
@@ -38,7 +41,8 @@ class OnBoardingViewModel @Inject constructor(
             selectedCity = selectedCity,
             isReadyToRegister = name.isNotBlank() && selectedCity != null,
             isAccountCreated = isAccountCreated,
-            showProgress = showProgress
+            showProgress = showProgress,
+            displayMode = displayMode
         )
     }.stateIn(
         viewModelScope,
@@ -72,8 +76,14 @@ data class OnBoardingUiState(
     val selectedCity: City? = null,
     val isReadyToRegister: Boolean = false,
     val isAccountCreated: Boolean = false,
-    val showProgress: Boolean = false
+    val showProgress: Boolean = false,
+    val displayMode: DisplayMode = DisplayMode.CREATE_ACCOUNT
 )
+
+enum class DisplayMode {
+    CREATE_ACCOUNT,
+    EDIT_ACCOUNT
+}
 
 data class City(
     val name: String,
@@ -84,7 +94,8 @@ object Cities {
     operator fun invoke(): List<City> {
         return listOf(
             "Вінниця" of 0,
-            "Київ" of 1
+            "Київ" of 1,
+            "Житомир" of 2,
         )
     }
 

@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
@@ -35,7 +36,8 @@ fun MyMissionsScreen(
     state: MyMissionsUiState,
     onEventClicked: (id: String) -> Unit,
     onFilterSelected: (filter: EventFilter) -> Unit,
-    onQrCodeClicked: () -> Unit
+    onQrCodeClicked: () -> Unit,
+    onRefresh: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -55,15 +57,14 @@ fun MyMissionsScreen(
             onFilterSelected
         )
 
+        val pullRefreshState = rememberPullRefreshState(state.isLoading, onRefresh = onRefresh)
+
         Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .background(LightGrayBackgroundColor)
-                .pullRefresh(
-                    state = rememberPullRefreshState(state.isLoading, onRefresh = {}),
-                    enabled = false
-                ),
+                .pullRefresh(state = pullRefreshState),
             contentAlignment = Alignment.Center
         ) {
             if (state.events.isEmpty()) {
@@ -84,11 +85,17 @@ fun MyMissionsScreen(
                             event = event,
                             onEventClicked = {
                                 onEventClicked(event.id)
-                            }
+                            },
+                            showStatus = true
                         )
                     }
                 }
             }
+            PullRefreshIndicator(
+                refreshing = state.isLoading,
+                state = pullRefreshState,
+                Modifier.align(Alignment.TopCenter)
+            )
         }
     }
 }
@@ -99,11 +106,13 @@ fun MyMissionsScreenPreview() {
     AppTheme {
         MyMissionsScreen(
             state = MyMissionsUiState(
-                isLoading = false,
+                isLoading = true,
                 events = listOf(previewEvent, previewEvent.copy(id = "2")),
             ),
             onEventClicked = {},
             onFilterSelected = {},
-            onQrCodeClicked = {})
+            onQrCodeClicked = {},
+            onRefresh = {}
+        )
     }
 }

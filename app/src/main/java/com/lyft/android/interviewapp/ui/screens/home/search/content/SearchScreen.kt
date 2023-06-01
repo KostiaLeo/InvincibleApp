@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
@@ -34,6 +35,7 @@ fun SearchScreen(
     onFilterSelected: (filter: EventFilter) -> Unit,
     onQrCodeClicked: () -> Unit,
     onCitySelected: (city: City) -> Unit,
+    onRefresh: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -49,15 +51,14 @@ fun SearchScreen(
             onFilterSelected
         )
 
+        val pullRefreshState = rememberPullRefreshState(state.isLoading, onRefresh = onRefresh)
+
         Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .background(LightGrayBackgroundColor)
-                .pullRefresh(
-                    state = rememberPullRefreshState(state.isLoading, onRefresh = {}),
-                    enabled = false
-                ),
+                .pullRefresh(state = pullRefreshState),
             contentAlignment = Alignment.Center
         ) {
             if (state.events.isEmpty()) {
@@ -69,7 +70,14 @@ fun SearchScreen(
                 )
             } else {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .pullRefresh(
+                            state = rememberPullRefreshState(
+                                state.isLoading,
+                                onRefresh = onRefresh
+                            ),
+                        ),
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -78,11 +86,17 @@ fun SearchScreen(
                             event = event,
                             onEventClicked = {
                                 onEventClicked(event.id)
-                            }
+                            },
+                            showStatus = false
                         )
                     }
                 }
             }
+            PullRefreshIndicator(
+                refreshing = state.isLoading,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
     }
 }
@@ -229,7 +243,8 @@ fun SearchScreenPreview() {
             onEventClicked = {},
             onFilterSelected = {},
             onQrCodeClicked = {},
-            onCitySelected = {}
+            onCitySelected = {},
+            onRefresh = {}
         )
     }
 }

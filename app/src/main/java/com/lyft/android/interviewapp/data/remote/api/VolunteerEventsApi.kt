@@ -8,11 +8,15 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface VolunteerEventsApi {
 
     @GET("events")
-    suspend fun getAllEvents(): EventsListApiResponse
+    suspend fun getAllEvents(
+        @Query("filterId") filterId: Int?,
+        @Query("cityCode") cityCode: Int
+    ): EventsListApiResponse
 
     @GET("events/{id}")
     suspend fun getEventDetails(@Path("id") id: String): EventDetailsResponse
@@ -23,6 +27,6 @@ interface VolunteerEventsApi {
     @POST("events/confirm")
     suspend fun confirmPresence(@Body requestBody: RequestBody)
 
-    @GET("events/my")
+    @GET("events/my?asVolunteer=true")
     suspend fun getMyMissionsList(): EventsListApiResponse
 }

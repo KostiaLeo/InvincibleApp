@@ -1,5 +1,6 @@
 package com.lyft.android.interviewapp.data.network
 
+import android.util.Log
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -20,6 +21,8 @@ class TokenRefreshInterceptor @Inject constructor(
         val request = originalRequest.newBuilder()
             .header("Authorization", "Bearer $accessToken")
             .build()
+
+        Log.d("TokenRefreshInterceptor", "Bearer $accessToken")
 
         val response = chain.proceed(request)
 

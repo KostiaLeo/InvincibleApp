@@ -37,23 +37,26 @@ class MyMissionsViewModel @Inject constructor(
 
     private fun loadEvents() {
         viewModelScope.launch(exceptionHandler) {
-            val events = repository.getMyMissionsList()
+            val events = repository.getMyMissionsList(
+                uiStateFlow.value.availableFilters.firstOrNull { it.isSelected }
+            )
             _uiStateFlow.update { it.copy(isLoading = false, events = events) }
         }
     }
 
     fun onFilterSelected(eventFilter: EventFilter) {
-        viewModelScope.launch {
-            val availableFilters = if (eventFilter.isSelected) {
-                uiStateFlow.value.allFilters
-            } else {
-                listOf(eventFilter.copy(isSelected = true))
-            }
-            _uiStateFlow.update { it.copy(availableFilters = availableFilters) }
-            if (!eventFilter.isSelected) {
-                // TODO: retrieve filtered events
-            }
+        val availableFilters = if (eventFilter.isSelected) {
+            uiStateFlow.value.allFilters
+        } else {
+            listOf(eventFilter.copy(isSelected = true))
         }
+        _uiStateFlow.update { it.copy(availableFilters = availableFilters) }
+        refresh()
+    }
+
+    fun refresh() {
+        _uiStateFlow.update { it.copy(isLoading = true) }
+        loadEvents()
     }
 }
 

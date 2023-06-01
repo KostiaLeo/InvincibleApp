@@ -35,6 +35,8 @@ import com.lyft.android.interviewapp.ui.screens.home.achievements.AchievementsSc
 import com.lyft.android.interviewapp.ui.screens.home.achievements.AchievementsViewModel
 import com.lyft.android.interviewapp.ui.screens.home.mymissions.MyMissionsScreen
 import com.lyft.android.interviewapp.ui.screens.home.mymissions.MyMissionsViewModel
+import com.lyft.android.interviewapp.ui.screens.home.profile.ProfileScreen
+import com.lyft.android.interviewapp.ui.screens.home.profile.ProfileViewModel
 import com.lyft.android.interviewapp.ui.screens.home.search.SearchViewModel
 import com.lyft.android.interviewapp.ui.screens.home.search.content.SearchScreen
 import com.lyft.android.interviewapp.ui.screens.qrcode.QrCodeActivityResultContract
@@ -42,7 +44,12 @@ import com.lyft.android.interviewapp.ui.theme.PrimaryColor
 import com.lyft.android.interviewapp.ui.theme.TextColor
 
 @Composable
-fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
+fun HomeScreen(
+    onEventClicked: (eventId: String) -> Unit,
+    onQrCodeScanned: (qrCodeContent: String?) -> Unit,
+    onLoggedOut: () -> Unit,
+    onEditProfileClicked: (userName: String) -> Unit,
+) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         (context as AppCompatActivity).run {
@@ -55,7 +62,7 @@ fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
     val homeViewModel = hiltViewModel<HomeScreenViewModel>()
     val qrCodeLauncher = rememberLauncherForActivityResult(
         contract = QrCodeActivityResultContract,
-        onResult = homeViewModel::onQrCodeScanned
+        onResult = onQrCodeScanned
     )
 
     val items = remember {
@@ -127,7 +134,8 @@ fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
                     onQrCodeClicked = {
                         qrCodeLauncher.launch(Unit)
                     },
-                    onCitySelected = viewModel::onCitySelected
+                    onCitySelected = viewModel::onCitySelected,
+                    onRefresh = viewModel::refresh
                 )
             }
 
@@ -141,18 +149,35 @@ fun HomeScreen(onEventClicked: (eventId: String) -> Unit) {
                     onFilterSelected = viewModel::onFilterSelected,
                     onQrCodeClicked = {
                         qrCodeLauncher.launch(Unit)
-                    }
+                    },
+                    onRefresh = viewModel::refresh
                 )
             }
             composable(HomeTabScreen.Achievements.route) {
                 val viewModel = hiltViewModel<AchievementsViewModel>()
                 AchievementsScreen(
                     viewModel.uiState,
-                    onQrCodeClicked = { qrCodeLauncher.launch(Unit) }
+                    onQrCodeClicked = { qrCodeLauncher.launch(Unit) },
+                    onRefresh = viewModel::refresh
                 )
             }
             composable(HomeTabScreen.Profile.route) {
-                Text(text = "Profile")
+                val viewModel = hiltViewModel<ProfileViewModel>()
+                if (viewModel.uiState.isLoggedOut) {
+                    LaunchedEffect(Unit) {
+                        onLoggedOut()
+                    }
+                }
+                ProfileScreen(
+                    viewModel.uiState,
+                    onQrCodeClicked = { qrCodeLauncher.launch(Unit) },
+                    onEditProfileClicked = {
+                        onEditProfileClicked(viewModel.uiState.name)
+                    },
+                    onAboutClicked = {},
+                    onLogoutClicked = viewModel::logout,
+                    onRefresh = viewModel::refresh
+                )
             }
         }
     }

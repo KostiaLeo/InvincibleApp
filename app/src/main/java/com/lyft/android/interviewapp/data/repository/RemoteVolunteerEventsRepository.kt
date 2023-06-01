@@ -5,7 +5,9 @@ import com.lyft.android.interviewapp.data.remote.api.VolunteerEventsApi
 import com.lyft.android.interviewapp.data.remote.models.RegisterForEventResponse
 import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
 import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel
+import com.lyft.android.interviewapp.ui.screens.onboarding.City
 import com.lyft.android.interviewapp.utils.DispatcherProvider
+import com.lyft.android.interviewapp.utils.EventFilter
 import com.lyft.android.interviewapp.utils.toRequestBody
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -15,9 +17,15 @@ class RemoteVolunteerEventsRepository @Inject constructor(
     private val dispatcherProvider: DispatcherProvider
 ) : VolunteerEventsRepository {
 
-    override suspend fun getAllEvents(): List<ShortEventUiModel> =
+    override suspend fun getAllEvents(
+        filter: EventFilter?,
+        selectedCity: City?
+    ): List<ShortEventUiModel> =
         withContext(dispatcherProvider.io) {
-            volunteerEventsApi.getAllEvents().events.map { it.mapToUiModel() }
+            volunteerEventsApi.getAllEvents(
+                filter?.id,
+                selectedCity?.code ?: -1
+            ).events.map { it.mapToUiModel() }
         }
 
     override suspend fun registerForEvent(eventId: String): RegisterForEventResponse =
@@ -32,7 +40,7 @@ class RemoteVolunteerEventsRepository @Inject constructor(
         volunteerEventsApi.confirmPresence(ConfirmPresenceRequest(qrCodeContent).toRequestBody())
     }
 
-    override suspend fun getMyMissionsList(): List<ShortEventUiModel> =
+    override suspend fun getMyMissionsList(filter: EventFilter?): List<ShortEventUiModel> =
         withContext(dispatcherProvider.io) {
             volunteerEventsApi.getMyMissionsList().events.map { it.mapToUiModel() }
         }

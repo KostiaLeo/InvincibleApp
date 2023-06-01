@@ -3,6 +3,8 @@ package com.lyft.android.interviewapp.data.mappers
 import com.lyft.android.interviewapp.data.remote.models.EventDetailsResponse
 import com.lyft.android.interviewapp.data.remote.models.ShortEvent
 import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
+import com.lyft.android.interviewapp.data.repository.models.EventStatus
+import com.lyft.android.interviewapp.data.repository.models.RegisterButtonConfigs
 import com.lyft.android.interviewapp.data.repository.models.RegistrationStatus
 import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel
 import java.text.DateFormat
@@ -23,6 +25,8 @@ private val timeFormat by lazy(LazyThreadSafetyMode.NONE) {
 fun EventDetailsResponse.mapToUiModel(): EventDetailsUiModel {
     val dateTime = eventInfo.date.toDateTime()
     val volunteersCount = "${eventInfo.curVolunteers}/${eventInfo.maxVolunteers}"
+    val eventStatus = EventStatus.fromInt(eventInfo.status)
+    val registrationStatus = RegistrationStatus.AVAILABLE
 
     return EventDetailsUiModel(
         id = eventInfo.id,
@@ -34,7 +38,7 @@ fun EventDetailsResponse.mapToUiModel(): EventDetailsUiModel {
         description = eventInfo.desctiption,
         duties = eventInfo.duties.orEmpty(),
         photos = emptyList(),
-        registrationStatus = RegistrationStatus.AVAILABLE
+        buttonConfigs = RegisterButtonConfigs.fromEventStatus(eventStatus, registrationStatus)
     )
 }
 

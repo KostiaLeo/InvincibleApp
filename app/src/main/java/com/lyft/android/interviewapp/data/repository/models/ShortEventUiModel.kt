@@ -6,4 +6,5 @@ data class ShortEventUiModel(
     val name: String = "",
     val location: String = "",
     val volunteersCount: String = "", // 12/50
+    val eventStatus: EventStatus = EventStatus.NONE,
 )

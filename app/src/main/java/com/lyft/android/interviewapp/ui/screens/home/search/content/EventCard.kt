@@ -2,9 +2,11 @@ package com.lyft.android.interviewapp.ui.screens.home.search.content
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,15 +30,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lyft.android.interviewapp.R
+import com.lyft.android.interviewapp.data.repository.models.EventStatus
 import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel
 import com.lyft.android.interviewapp.ui.theme.AppTheme
 import com.lyft.android.interviewapp.ui.theme.EventBorderColor
 import com.lyft.android.interviewapp.ui.theme.HintTextColor
+import com.lyft.android.interviewapp.ui.theme.LightGrayBackgroundColor
 import com.lyft.android.interviewapp.ui.theme.OnSurfacePrimary
 import com.lyft.android.interviewapp.ui.theme.eUkraineFontFamily
 
 @Composable
-fun EventCard(event: ShortEventUiModel, onEventClicked: () -> Unit) {
+fun EventCard(
+    event: ShortEventUiModel,
+    onEventClicked: () -> Unit,
+    showStatus: Boolean
+) {
     Surface(
         border = BorderStroke(1.dp, EventBorderColor),
         shape = RoundedCornerShape(8.dp)
@@ -86,6 +94,19 @@ fun EventCard(event: ShortEventUiModel, onEventClicked: () -> Unit) {
                         fontWeight = FontWeight.W400
                     )
                 }
+                if (showStatus && event.eventStatus == EventStatus.FINISHED) {
+                    Box(
+                        modifier = Modifier
+                            .background(LightGrayBackgroundColor, RoundedCornerShape(6.dp))
+                            .padding(vertical = 8.dp, horizontal = 12.dp)
+                    ) {
+                        Text(
+                            text = "Завершено",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.W300
+                        )
+                    }
+                }
             }
         }
     }
@@ -124,8 +145,9 @@ fun EventMetadata(
 fun EventCardPreview() {
     AppTheme {
         EventCard(
-            event = previewEvent,
-            onEventClicked = {}
+            event = previewEvent.copy(eventStatus = EventStatus.FINISHED),
+            onEventClicked = {},
+            showStatus = true
         )
     }
 }

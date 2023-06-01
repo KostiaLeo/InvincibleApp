@@ -11,6 +11,8 @@ data class EventInfo(
     val name: String,
     val location: String,
     val date: String,
+    val length: Int,
+    val status: Int,
     val type: Int,
     val curVolunteers: Int,
     val maxVolunteers: Int,

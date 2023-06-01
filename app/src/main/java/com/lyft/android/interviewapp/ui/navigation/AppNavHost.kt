@@ -18,6 +18,7 @@ import com.lyft.android.interviewapp.ui.screens.details.EventDetailsViewModel
 import com.lyft.android.interviewapp.ui.screens.home.HomeScreen
 import com.lyft.android.interviewapp.ui.screens.login.LoginScreen
 import com.lyft.android.interviewapp.ui.screens.login.LoginViewModel
+import com.lyft.android.interviewapp.ui.screens.onboarding.DisplayMode
 import com.lyft.android.interviewapp.ui.screens.onboarding.OnBoardingScreen
 import com.lyft.android.interviewapp.ui.screens.onboarding.OnBoardingViewModel
 import com.lyft.android.interviewapp.ui.screens.qrcode.QrCodeActivityResultContract
@@ -43,7 +44,12 @@ fun AppNavHost(
                 onAuthResult = viewModel::handleGoogleAccountTask,
                 onLoginCompleted = { isNewUser, userName ->
                     if (isNewUser) {
-                        navController.navigate(Navigation.onBoardingDestination(userName))
+                        navController.navigate(
+                            Navigation.onBoardingDestination(
+                                userName,
+                                DisplayMode.CREATE_ACCOUNT
+                            )
+                        )
                     } else {
                         navController.navigate(Routes.home)
                     }
@@ -63,7 +69,13 @@ fun AppNavHost(
                 onNameChanged = viewModel::onNameChanged,
                 onCitySelected = viewModel::onCitySelected,
                 onCreateAccountClicked = viewModel::createAccount,
-                onAccountCreated = { navController.navigate(Routes.home) },
+                onAccountCreated = {
+                    if (state.displayMode == DisplayMode.CREATE_ACCOUNT) {
+                        navController.navigate(Routes.home)
+                    } else {
+                        navController.popBackStack()
+                    }
+                },
                 onCloseClicked = navController::popBackStack
             )
         }
@@ -71,14 +83,37 @@ fun AppNavHost(
         composable(Routes.home) {
             HomeScreen(
                 onEventClicked = { eventId ->
-                    navController.navigate(Navigation.eventDetailsDestination(eventId))
+                    navController.navigate(Navigation.eventDetailsDestination(eventId, false))
+                },
+                onLoggedOut = {
+                    navController.navigate(Routes.login) {
+                        popUpTo(0)
+                    }
+                },
+                onQrCodeScanned = { qrCodeContent ->
+                    qrCodeContent?.let {
+                        navController.navigate(Navigation.eventDetailsDestination(it, true))
+                    }
+                },
+                onEditProfileClicked = {
+                    navController.navigate(
+                        Navigation.onBoardingDestination(
+                            it,
+                            DisplayMode.EDIT_ACCOUNT
+                        )
+                    )
                 }
             )
         }
 
         composable(
             route = Routes.eventDetails,
-            arguments = listOf(navArgument(NavArguments.eventId) { type = NavType.StringType })
+            arguments = listOf(
+                navArgument(NavArguments.eventId) { type = NavType.StringType },
+                navArgument(NavArguments.confirmUser) {
+                    type = NavType.BoolType; defaultValue = false
+                }
+            )
         ) {
             val viewModel: EventDetailsViewModel = hiltViewModel()
             val state by viewModel.uiStateFlow.collectAsStateWithLifecycle()
@@ -96,6 +131,7 @@ fun AppNavHost(
                     qrCodeLauncher.launch(Unit)
                 },
                 callOrganizerClicked = {},
+                onRefresh = viewModel::refresh
             )
         }
     }

@@ -44,26 +44,33 @@ class AchievementsViewModel @Inject constructor(
 
     private fun getAchievements() {
         viewModelScope.launch(exceptionHandler) {
+            uiState = uiState.copy(
+                isLoading = true
+            )
             identityRepository.getMyInfo().let {
                 Log.d("ACHIEVEMENTS", it.toString())
                 uiState = uiState.copy(
                     isLoading = false,
                     experience = it.experience,
                     level = it.level,
-                    statistics = it.statistics,
+                    statistics = it.statistics.statList,
                     puzzlesCollection = it.mapToCollectionItems()
                 )
             }
         }
     }
+
+    fun refresh() {
+        getAchievements()
+    }
 }
 
 suspend fun MyInfoResponse.mapToCollectionItems(): List<PuzzleCollectionItem> = buildList {
-    if (slotsAmount == 0) {
+    if (puzzleSlots == 0) {
         add(PuzzleCollectionItem.NoItems)
         return@buildList
     }
-    if (slotsAmount > completedPuzzlesIds.size && currentPuzzlePieces.isEmpty()) {
+    if (puzzleSlots > completedPuzzlesIds.size && currentPuzzlePieces.isEmpty()) {
         add(PuzzleCollectionItem.EmptySlot)
     }
     val storageRef = Firebase.storage.reference

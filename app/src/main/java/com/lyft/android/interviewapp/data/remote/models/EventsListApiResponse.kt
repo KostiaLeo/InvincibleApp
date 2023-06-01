@@ -7,9 +7,12 @@ data class EventsListApiResponse(
 data class ShortEvent(
     val id: String,
     val name: String,
-    val date: String,
     val location: String,
+    val cityCode: Int,
+    val date: String,
+    val length: Int,
+    val type: Int,
+    val status: Int,
     val curVolunteers: Int,
-    val maxVolunteers: Int,
-    val type: Int
+    val maxVolunteers: Int
 )

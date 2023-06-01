@@ -40,30 +40,32 @@ class SearchViewModel @Inject constructor(
 
     private fun loadEvents() {
         viewModelScope.launch(exceptionHandler) {
-            val events = repository.getAllEvents()
+            val events = repository.getAllEvents(
+                uiStateFlow.value.availableFilters.firstOrNull { it.isSelected },
+                uiStateFlow.value.selectedCity
+            )
             _uiStateFlow.update { it.copy(isLoading = false, events = events) }
         }
     }
 
     fun onFilterSelected(eventFilter: EventFilter) {
-        viewModelScope.launch {
-            val availableFilters = if (eventFilter.isSelected) {
-                uiStateFlow.value.allFilters
-            } else {
-                listOf(eventFilter.copy(isSelected = true))
-            }
-            _uiStateFlow.update { it.copy(availableFilters = availableFilters) }
-            if (!eventFilter.isSelected) {
-                // TODO: retrieve filtered events
-            }
+        val availableFilters = if (eventFilter.isSelected) {
+            uiStateFlow.value.allFilters
+        } else {
+            listOf(eventFilter.copy(isSelected = true))
         }
+        _uiStateFlow.update { it.copy(availableFilters = availableFilters) }
+        refresh()
     }
 
     fun onCitySelected(city: City) {
-        viewModelScope.launch {
-            _uiStateFlow.update { it.copy(selectedCity = city) }
-            // TODO: load filtered events
-        }
+        _uiStateFlow.update { it.copy(selectedCity = city) }
+        refresh()
+    }
+
+    fun refresh() {
+        _uiStateFlow.update { it.copy(isLoading = true) }
+        loadEvents()
     }
 }
 

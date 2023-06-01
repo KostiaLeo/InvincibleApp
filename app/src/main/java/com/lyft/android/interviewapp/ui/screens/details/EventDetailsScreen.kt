@@ -12,7 +12,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +40,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.lyft.android.interviewapp.R
 import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
+import com.lyft.android.interviewapp.data.repository.models.EventStatus
 import com.lyft.android.interviewapp.data.repository.models.RegisterButtonConfigs
 import com.lyft.android.interviewapp.data.repository.models.RegistrationStatus
 import com.lyft.android.interviewapp.ui.screens.home.search.content.EventMetadata
@@ -50,91 +55,128 @@ fun EventDetailsScreen(
     onRegisterClicked: () -> Unit,
     onGoBackClicked: () -> Unit,
     onQrCodeClicked: () -> Unit,
-    callOrganizerClicked: () -> Unit
+    callOrganizerClicked: () -> Unit,
+    onRefresh: () -> Unit
 ) {
+    val scaffoldState = rememberScaffoldState()
+
+    if (state.showConfirmedMessage) {
+        LaunchedEffect(Unit) {
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = "Ваша присутність підтверджена",
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = {
             EventDetailsTopBar(onGoBackClicked, onQrCodeClicked)
         },
         content = { paddingValues ->
-            EventDetailsContent(paddingValues, state, callOrganizerClicked)
+            EventDetailsContent(paddingValues, state, callOrganizerClicked, onRefresh)
         },
         bottomBar = {
             EventDetailsBottomBar(state, onRegisterClicked)
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = it,
+                snackbar = { snackbarData ->
+                    Snackbar(
+                        snackbarData,
+                        backgroundColor = Color(0xFFDEF7EC),
+                        contentColor = Color(0xFF046C4E),
+                    )
+                }
+            )
         }
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun EventDetailsContent(
     paddingValues: PaddingValues,
     state: PlaceDetailsUiState,
-    callOrganizerClicked: () -> Unit
+    callOrganizerClicked: () -> Unit,
+    onRefresh: () -> Unit
 ) {
-    Column(
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isLoading,
+        onRefresh = onRefresh
+    )
+    Box(
         modifier = Modifier
-            .padding(paddingValues)
-            .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState())
+            .fillMaxSize()
+            .pullRefresh(pullRefreshState)
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = state.details.name,
-            fontWeight = FontWeight.Bold,
-            fontSize = 24.sp
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        EventMetadata(address = state.details.location, dateTime = state.details.dateTime)
-        ContentDivider()
-        Text(
-            text = "Про місію",
-            fontWeight = FontWeight.W500,
-            fontSize = 14.sp
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        ExpandableText(
-            text = state.details.description,
-            minimizedMaxLines = 4,
-            style = TextStyle(
-                fontWeight = FontWeight.W300,
-                fontSize = 13.sp,
-                color = HintTextColor,
-                letterSpacing = 0.8.sp
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = state.details.name,
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp
             )
-        )
-        ContentDivider()
-        Organizer(state.details, callOrganizerClicked)
-        ContentDivider()
-
-        Text(text = "Фотозвіт", fontWeight = FontWeight.W500, fontSize = 14.sp)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (state.details.photos.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(288.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(color = LightGrayBackgroundColor),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Фотозвіт буде завантажено організатором після завершення місії",
+            Spacer(modifier = Modifier.height(8.dp))
+            EventMetadata(address = state.details.location, dateTime = state.details.dateTime)
+            ContentDivider()
+            Text(
+                text = "Про місію",
+                fontWeight = FontWeight.W500,
+                fontSize = 14.sp
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            ExpandableText(
+                text = state.details.description,
+                minimizedMaxLines = 4,
+                style = TextStyle(
                     fontWeight = FontWeight.W300,
                     fontSize = 13.sp,
                     color = HintTextColor,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 30.dp)
+                    letterSpacing = 0.8.sp
                 )
+            )
+            ContentDivider()
+            Organizer(state.details, callOrganizerClicked)
+            ContentDivider()
+
+            Text(text = "Фотозвіт", fontWeight = FontWeight.W500, fontSize = 14.sp)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (state.details.photos.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(288.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(color = LightGrayBackgroundColor),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Фотозвіт буде завантажено організатором після завершення місії",
+                        fontWeight = FontWeight.W300,
+                        fontSize = 13.sp,
+                        color = HintTextColor,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 30.dp)
+                    )
+                }
+            } else {
+                PhotosCarousel(state.details.photos)
             }
-        } else {
-            PhotosCarousel(state.details.photos)
+            Spacer(modifier = Modifier.height(24.dp))
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        PullRefreshIndicator(refreshing = state.isLoading, state = pullRefreshState)
     }
 }
 
-// PhotosCarousel function that takes list of strings. load them from network and display them in lazy row with 8dp spacing between. each LazyRow item is image with 216x288dp size
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun PhotosCarousel(photos: List<String>) {
@@ -308,23 +350,29 @@ fun EventDetailsBottomBar(
                 )
             }
 
-            val configs =
-                RegisterButtonConfigs.fromRegistrationStatus(state.details.registrationStatus)
-            Button(
-                modifier = Modifier.size(200.dp, 48.dp),
+            val configs = state.details.buttonConfigs
+            Surface(
                 shape = RoundedCornerShape(6.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = configs.color,
-                    contentColor = Color.White
-                ),
-                enabled = configs.clickable,
-                onClick = onRegisterClicked
+                color = configs.color,
+                contentColor = configs.textColor,
+                modifier = Modifier
+                    .size(200.dp, 48.dp)
+                    .apply {
+                        if (configs.clickable) {
+                            clickable(onClick = onRegisterClicked)
+                        }
+                    }
             ) {
-                Text(
-                    text = configs.text,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.W500
-                )
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = configs.text,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.W500
+                    )
+                }
             }
         }
     }
@@ -341,17 +389,24 @@ fun EventDetailsScreenPreview() {
                     organizer = "Kostia",
                     location = "Vinnytsia",
                     dateTime = "12:00 - 14:00 • 24 Травня 2023",
-                    description = "Волонтерська місія зосереджена на розчищенні доріг від уламків та завалів після ракетного обстрілу. Однією з наших найважливіших метою є відновлення"
-                        .repeat(2),
+                    description = (
+                            "Волонтерська місія зосереджена на розчищенні доріг від уламків " +
+                                    "та завалів після ракетного обстрілу. " +
+                                    "Однією з наших найважливіших метою є відновлення"
+                            ).repeat(2),
                     volunteersCount = "12/50",
-                    registrationStatus = RegistrationStatus.AVAILABLE
+                    buttonConfigs = RegisterButtonConfigs.fromEventStatus(
+                        EventStatus.ACTIVE,
+                        RegistrationStatus.AVAILABLE
+                    )
                 ),
                 isLoading = false
             ),
             onRegisterClicked = {},
             onGoBackClicked = {},
             onQrCodeClicked = {},
-            callOrganizerClicked = {}
+            callOrganizerClicked = {},
+            {}
         )
     }
 }

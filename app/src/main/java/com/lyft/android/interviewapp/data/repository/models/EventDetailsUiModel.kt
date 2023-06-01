@@ -1,7 +1,9 @@
 package com.lyft.android.interviewapp.data.repository.models
 
 import androidx.compose.ui.graphics.Color
+import com.lyft.android.interviewapp.ui.theme.LightGrayBackgroundColor
 import com.lyft.android.interviewapp.ui.theme.PrimaryColor
+import com.lyft.android.interviewapp.ui.theme.TextColor
 
 data class EventDetailsUiModel(
     val id: String = "",
@@ -13,43 +15,79 @@ data class EventDetailsUiModel(
     val description: String = "",
     val duties: String = "",
     val photos: List<String> = emptyList(),
-    val registrationStatus: RegistrationStatus = RegistrationStatus.UNKNOWN
+    val buttonConfigs: RegisterButtonConfigs = RegisterButtonConfigs.fromEventStatus(
+        EventStatus.NONE,
+        RegistrationStatus.UNKNOWN
+    )
 )
 
 enum class RegistrationStatus {
-    AVAILABLE, REGISTERED, COMPLETED, UNKNOWN
+    AVAILABLE, REGISTERED, CONFIRMED, UNKNOWN
+}
+
+enum class EventStatus {
+    NONE, DRAFT, ACTIVE, IN_PROGRESS, FINISHED, ARCHIVED;
+
+    companion object {
+
+        fun fromInt(value: Int): EventStatus {
+            return EventStatus.values().getOrElse(value) { NONE }
+        }
+    }
 }
 
 class RegisterButtonConfigs(
     val color: Color,
     val text: String,
-    val clickable: Boolean
+    val clickable: Boolean,
+    val textColor: Color
 ) {
     companion object {
-        fun fromRegistrationStatus(registrationStatus: RegistrationStatus): RegisterButtonConfigs {
-            return when (registrationStatus) {
-                RegistrationStatus.AVAILABLE -> RegisterButtonConfigs(
+        fun fromEventStatus(
+            eventStatus: EventStatus,
+            registrationStatus: RegistrationStatus
+        ): RegisterButtonConfigs {
+            return when {
+                eventStatus == EventStatus.FINISHED -> RegisterButtonConfigs(
+                    LightGrayBackgroundColor,
+                    "Завершено",
+                    false,
+                    Color(0xFF374151)
+                )
+
+                registrationStatus == RegistrationStatus.AVAILABLE -> RegisterButtonConfigs(
                     PrimaryColor,
                     "Приєднатись",
-                    true
+                    true,
+                    Color.White
                 )
 
-                RegistrationStatus.COMPLETED -> RegisterButtonConfigs(
-                    Color(0xFF9CA3AF),
-                    "Завершено",
-                    false
+                registrationStatus == RegistrationStatus.CONFIRMED -> RegisterButtonConfigs(
+                    Color(0xFFDEF7EC),
+                    "Підтверджено",
+                    false,
+                    Color(0xFF046C4E)
                 )
 
-                RegistrationStatus.REGISTERED -> RegisterButtonConfigs(
-                    Color(0xFF0E9F6E),
+                registrationStatus == RegistrationStatus.REGISTERED -> RegisterButtonConfigs(
+                    Color(0xFFD5F5F6),
                     "Зареєстровано",
-                    false
+                    false,
+                    Color(0xFF0694A2)
                 )
 
-                RegistrationStatus.UNKNOWN -> RegisterButtonConfigs(
+                registrationStatus == RegistrationStatus.UNKNOWN -> RegisterButtonConfigs(
                     Color(0xFF9CA3AF),
-                    "Сталася помилка :(",
-                    false
+                    "Сталася помилка",
+                    false,
+                    TextColor
+                )
+
+                else -> RegisterButtonConfigs(
+                    Color(0xFF9CA3AF),
+                    "...",
+                    false,
+                    TextColor
                 )
             }
         }
