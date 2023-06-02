@@ -31,6 +31,9 @@ class AppNavHostViewModel @Inject constructor(
     }
 
     fun onQrCodeScanned(result: String?) {
+        if (result == null) {
+            return
+        }
         viewModelScope.launch(exceptionHandler) {
             uiState = uiState.copy(isLoading = true)
             qrCodeScannedUseCase(result)

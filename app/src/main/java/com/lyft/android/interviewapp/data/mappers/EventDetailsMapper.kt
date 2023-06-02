@@ -19,7 +19,7 @@ private val dateFormat by lazy(LazyThreadSafetyMode.NONE) {
 }
 
 private val timeFormat by lazy(LazyThreadSafetyMode.NONE) {
-    SimpleDateFormat("hh:mm", Locale.getDefault())
+    SimpleDateFormat("HH:mm", Locale.getDefault())
 }
 
 fun EventDetailsResponse.mapToUiModel(): EventDetailsUiModel {
@@ -49,7 +49,8 @@ fun ShortEvent.mapToUiModel(): ShortEventUiModel {
         dateTime = date.toDateTime(length),
         name = name,
         location = location,
-        volunteersCount = volunteersCount
+        volunteersCount = volunteersCount,
+        eventStatus = EventStatus.fromInt(status)
     )
 }
 

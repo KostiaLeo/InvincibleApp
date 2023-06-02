@@ -80,7 +80,7 @@ fun MyMissionsScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(state.events) { event ->
+                    items(state.events, key = { it.id }) { event ->
                         EventCard(
                             event = event,
                             onEventClicked = {

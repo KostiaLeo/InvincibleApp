@@ -88,7 +88,7 @@ suspend fun MyInfoResponse.mapToCollectionItems(): List<PuzzleCollectionItem> = 
                 .awaitAll()
                 .map(Uri::toString)
         }
-        add(PuzzleCollectionItem.CurrentPuzzle(currentPuzzlePiecesUrls))
+        add(PuzzleCollectionItem.CurrentPuzzle(currentPuzzlePiecesUrls, currentPuzzlePieces))
     }
     withContext(Dispatchers.IO) {
         addAll(
@@ -115,7 +115,9 @@ suspend fun MyInfoResponse.mapToCollectionItems(): List<PuzzleCollectionItem> = 
 sealed interface PuzzleCollectionItem {
     object NoItems : PuzzleCollectionItem
     object EmptySlot : PuzzleCollectionItem
-    data class CurrentPuzzle(val piecesUrls: List<String>) : PuzzleCollectionItem
+    data class CurrentPuzzle(val piecesUrls: List<String>, val pieces: List<Int>) :
+        PuzzleCollectionItem
+
     data class CompletedPuzzle(
         val puzzleUrl: String, val puzzleName: String, val author: String
     ) : PuzzleCollectionItem

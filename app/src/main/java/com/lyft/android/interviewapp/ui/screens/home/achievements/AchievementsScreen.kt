@@ -273,7 +273,7 @@ fun CurrentPuzzleContent(item: PuzzleCollectionItem.CurrentPuzzle) {
                 Alignment.TopEnd,
                 Alignment.BottomStart,
                 Alignment.BottomEnd
-            ).take(item.piecesUrls.size)
+            )
         }
         val sizes = remember {
             listOf(
@@ -283,20 +283,25 @@ fun CurrentPuzzleContent(item: PuzzleCollectionItem.CurrentPuzzle) {
                 DpSize(172.dp, 233.dp),
             )
         }
-        val parameters = remember(itemAlignments, sizes, item.piecesUrls) {
-            itemAlignments.zip(item.piecesUrls)
-                .zip(sizes) { (alignment, url), size -> Triple(alignment, url, size) }
-        }
-        parameters.forEach { (alignment, url, size) ->
-            GlideImage(
-                modifier = Modifier
-                    .align(alignment)
-                    .size(size),
-                model = url,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-            )
-        }
+        val params = itemAlignments.zip(sizes)
+
+        item.pieces
+            .map {
+                params[it]
+            }
+            .zip(item.piecesUrls) { (alignment, size), url ->
+                Triple(alignment, size, url)
+            }
+            .forEach { (alignment, size, url) ->
+                GlideImage(
+                    modifier = Modifier
+                        .align(alignment)
+                        .size(size),
+                    model = url,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                )
+            }
 
     }
 }

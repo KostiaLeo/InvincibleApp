@@ -17,17 +17,17 @@ data class EventDetailsUiModel(
     val photos: List<String> = emptyList(),
     val buttonConfigs: RegisterButtonConfigs = RegisterButtonConfigs.fromEventStatus(
         EventStatus.NONE,
-        RegistrationStatus.UNKNOWN
+        RegistrationStatus.NONE
     )
 )
 
 enum class RegistrationStatus {
-    AVAILABLE, FULL, REGISTERED, CONFIRMED, UNKNOWN;
+    NONE, AVAILABLE, FULL, REGISTERED, CONFIRMED;
 
     companion object {
 
         fun fromInt(value: Int): RegistrationStatus {
-            return RegistrationStatus.values().getOrElse(value) { UNKNOWN }
+            return RegistrationStatus.values().getOrElse(value) { NONE }
         }
     }
 
@@ -89,13 +89,6 @@ class RegisterButtonConfigs(
                     "Набір завершено",
                     false,
                     Color(0xFF374151)
-                )
-
-                registrationStatus == RegistrationStatus.UNKNOWN -> RegisterButtonConfigs(
-                    Color(0xFF9CA3AF),
-                    "...",
-                    false,
-                    TextColor
                 )
 
                 else -> RegisterButtonConfigs(

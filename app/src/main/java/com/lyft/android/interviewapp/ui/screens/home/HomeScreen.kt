@@ -166,7 +166,7 @@ fun HomeScreen(
                     uiState,
                     onQrCodeClicked = onQrCodeClicked,
                     onEditProfileClicked = {
-                        onEditProfileClicked(viewModel.uiState.name)
+                        onEditProfileClicked(uiState.name)
                     },
                     onAboutClicked = {},
                     onLogoutClicked = viewModel::logout,

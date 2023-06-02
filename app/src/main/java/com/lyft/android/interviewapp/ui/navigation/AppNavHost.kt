@@ -109,15 +109,6 @@ fun AppNavHost(
                         },
                         shape = RoundedCornerShape(8.dp),
                     ) {
-//                        Card(
-//                            modifier = Modifier,
-//                            shape = RoundedCornerShape(8.dp),
-//                            backgroundColor = if (hostState.isSuccess) {
-//                                Color(0xFFDEF7EC)
-//                            } else {
-//                                Color(0xFFFDE8E8)
-//                            },
-//                        ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -157,7 +148,6 @@ fun AppNavHost(
                             )
                         }
                     }
-//                    }
                 }
             )
         }
