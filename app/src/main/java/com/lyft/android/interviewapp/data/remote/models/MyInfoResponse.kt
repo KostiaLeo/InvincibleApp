@@ -4,9 +4,9 @@ data class MyInfoResponse(
     val name: String,
     val cityCode: Int,
     val experience: Int,
+    val puzzleSlotsCount: Int,
     val currentPuzzleId: Int,
     val currentPuzzlePieces: List<Int>,
-    val puzzleSlots: Int = 0,
     val completedPuzzlesIds: List<Int>,
     val level: Int,
     val statistics: Statistics

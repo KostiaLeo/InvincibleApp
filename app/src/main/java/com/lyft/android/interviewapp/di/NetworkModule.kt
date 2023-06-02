@@ -21,11 +21,13 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
+import java.lang.reflect.Type
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -53,6 +55,7 @@ abstract class NetworkModule {
             converterFactory: Converter.Factory
         ): Retrofit {
             return Retrofit.Builder()
+                .addConverterFactory(NullOrEmptyConverterFactory())
                 .addConverterFactory(converterFactory)
                 .client(okHttpClient)
                 .baseUrl(BuildConfig.API_BASE_URL)
@@ -115,4 +118,22 @@ abstract class NetworkModule {
     @Interceptors
     @Singleton
     abstract fun bindTokenRefreshInterceptor(tokenRefreshInterceptor: TokenRefreshInterceptor): Interceptor
+}
+
+class NullOrEmptyConverterFactory : Converter.Factory() {
+    fun converterFactory() = this
+    fun asLenient() = true
+
+    override fun responseBodyConverter(
+        type: Type,
+        annotations: Array<Annotation>,
+        retrofit: Retrofit
+    ) =
+        object : Converter<ResponseBody, Any?> {
+            val nextResponseBodyConverter =
+                retrofit.nextResponseBodyConverter<Any?>(converterFactory(), type, annotations)
+
+            override fun convert(value: ResponseBody) =
+                if (value.contentLength() != 0L) nextResponseBodyConverter.convert(value) else null
+        }
 }

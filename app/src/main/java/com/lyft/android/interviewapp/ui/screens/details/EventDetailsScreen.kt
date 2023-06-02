@@ -16,7 +16,6 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,11 +25,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.lyft.android.interviewapp.R
+import com.lyft.android.interviewapp.data.remote.models.OrganizerInfo
 import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
 import com.lyft.android.interviewapp.data.repository.models.EventStatus
 import com.lyft.android.interviewapp.data.repository.models.RegisterButtonConfigs
@@ -55,22 +57,10 @@ fun EventDetailsScreen(
     onRegisterClicked: () -> Unit,
     onGoBackClicked: () -> Unit,
     onQrCodeClicked: () -> Unit,
-    callOrganizerClicked: () -> Unit,
+    callOrganizerClicked: (phoneNumber: String) -> Unit,
     onRefresh: () -> Unit
 ) {
-    val scaffoldState = rememberScaffoldState()
-
-    if (state.showConfirmedMessage) {
-        LaunchedEffect(Unit) {
-            scaffoldState.snackbarHostState.showSnackbar(
-                message = "Ваша присутність підтверджена",
-                duration = SnackbarDuration.Short
-            )
-        }
-    }
-
     Scaffold(
-        scaffoldState = scaffoldState,
         topBar = {
             EventDetailsTopBar(onGoBackClicked, onQrCodeClicked)
         },
@@ -79,18 +69,6 @@ fun EventDetailsScreen(
         },
         bottomBar = {
             EventDetailsBottomBar(state, onRegisterClicked)
-        },
-        snackbarHost = {
-            SnackbarHost(
-                hostState = it,
-                snackbar = { snackbarData ->
-                    Snackbar(
-                        snackbarData,
-                        backgroundColor = Color(0xFFDEF7EC),
-                        contentColor = Color(0xFF046C4E),
-                    )
-                }
-            )
         }
     )
 }
@@ -100,7 +78,7 @@ fun EventDetailsScreen(
 private fun EventDetailsContent(
     paddingValues: PaddingValues,
     state: PlaceDetailsUiState,
-    callOrganizerClicked: () -> Unit,
+    callOrganizerClicked: (phoneNumber: String) -> Unit,
     onRefresh: () -> Unit
 ) {
     val pullRefreshState = rememberPullRefreshState(
@@ -137,14 +115,15 @@ private fun EventDetailsContent(
                 text = state.details.description,
                 minimizedMaxLines = 4,
                 style = TextStyle(
-                    fontWeight = FontWeight.W300,
-                    fontSize = 13.sp,
+                    fontWeight = FontWeight.W400,
+                    fontSize = 14.sp,
                     color = HintTextColor,
-                    letterSpacing = 0.8.sp
+                    letterSpacing = 0.6.sp,
+                    lineHeight = 20.sp
                 )
             )
             ContentDivider()
-            Organizer(state.details, callOrganizerClicked)
+            Organizer(state.details.organizer, callOrganizerClicked)
             ContentDivider()
 
             Text(text = "Фотозвіт", fontWeight = FontWeight.W500, fontSize = 14.sp)
@@ -173,7 +152,11 @@ private fun EventDetailsContent(
             }
             Spacer(modifier = Modifier.height(24.dp))
         }
-        PullRefreshIndicator(refreshing = state.isLoading, state = pullRefreshState)
+        PullRefreshIndicator(
+            refreshing = state.isLoading,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 
@@ -185,13 +168,15 @@ fun PhotosCarousel(photos: List<String>) {
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(photos.size) { photoUrl ->
+        items(photos.size) { index ->
             GlideImage(
                 modifier = Modifier
                     .size(DpSize(216.dp, 288.dp))
-                    .background(color = LightGrayBackgroundColor),
-                model = photoUrl,
-                contentDescription = null
+                    .background(LightGrayBackgroundColor, RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(8.dp)),
+                model = photos[index],
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
             )
         }
     }
@@ -199,36 +184,59 @@ fun PhotosCarousel(photos: List<String>) {
 
 @Composable
 fun Organizer(
-    details: EventDetailsUiModel,
-    callOrganizerClicked: () -> Unit
+    organizer: OrganizerInfo,
+    callOrganizerClicked: (phoneNumber: String) -> Unit
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
     ) {
-        Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column {
+                Text(
+                    text = organizer.name ?: "Волонтер",
+                    fontWeight = FontWeight.W500,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = "Організатор",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.W300
+                )
+            }
+            if (!organizer.phoneNumber.isNullOrBlank()) {
+                Image(
+                    modifier = Modifier
+                        .background(
+                            color = LightGrayBackgroundColor,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(11.dp)
+                        .clickable {
+                            callOrganizerClicked(organizer.phoneNumber)
+                        },
+                    painter = painterResource(R.drawable.ic_phone),
+                    contentDescription = null
+                )
+            }
+        }
+
+        if (!organizer.description.isNullOrBlank()) {
+            Spacer(modifier = Modifier.height(16.dp))
+
             Text(
-                text = details.organizer,
-                fontWeight = FontWeight.W500,
-                fontSize = 14.sp
-            )
-            Text(
-                text = "Організатор",
+                text = organizer.description,
                 fontSize = 13.sp,
-                fontWeight = FontWeight.W300
+                fontWeight = FontWeight.W300,
+                color = HintTextColor,
+                lineHeight = 20.sp
             )
         }
-        Image(
-            modifier = Modifier
-                .background(
-                    color = LightGrayBackgroundColor,
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .padding(11.dp),
-            painter = painterResource(R.drawable.ic_phone),
-            contentDescription = null
-        )
+
     }
 }
 
@@ -280,9 +288,14 @@ fun ExpandableText(
                             interactionSource = remember { MutableInteractionSource() },
                             onClick = { expanded = !expanded }
                         ),
-                    text = "Show More",
-                    color = MaterialTheme.colors.primary,
-                    style = style
+                    text = "Більше",
+                    color = HintTextColor,
+                    style = TextStyle(
+                        fontWeight = FontWeight.W500,
+                        fontSize = 13.sp,
+                        letterSpacing = 0.6.sp,
+                        textDecoration = TextDecoration.Underline
+                    )
                 )
             }
         }
@@ -351,28 +364,30 @@ fun EventDetailsBottomBar(
             }
 
             val configs = state.details.buttonConfigs
-            Surface(
-                shape = RoundedCornerShape(6.dp),
-                color = configs.color,
-                contentColor = configs.textColor,
+
+            Box(
                 modifier = Modifier
                     .size(200.dp, 48.dp)
-                    .apply {
+                    .background(
+                        color = configs.color,
+                        shape = RoundedCornerShape(6.dp)
+                    )
+                    .clip(RoundedCornerShape(6.dp))
+                    .run {
                         if (configs.clickable) {
                             clickable(onClick = onRegisterClicked)
+                        } else {
+                            this
                         }
-                    }
+                    },
+                contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = configs.text,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.W500
-                    )
-                }
+                Text(
+                    text = configs.text,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.W500,
+                    color = configs.textColor
+                )
             }
         }
     }
@@ -386,7 +401,13 @@ fun EventDetailsScreenPreview() {
             state = PlaceDetailsUiState(
                 details = EventDetailsUiModel(
                     name = "Event name",
-                    organizer = "Kostia",
+                    organizer = OrganizerInfo(
+                        "Kostia",
+                        "+3800971231231",
+                        "Ми допомагаємо армії України та громадянам, " +
+                                "які постраждали від російської агресії. " +
+                                "Допомогти може кожен!"
+                    ),
                     location = "Vinnytsia",
                     dateTime = "12:00 - 14:00 • 24 Травня 2023",
                     description = (

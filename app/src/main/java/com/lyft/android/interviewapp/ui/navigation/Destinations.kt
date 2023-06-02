@@ -15,7 +15,6 @@ object Screens {
 
 object NavArguments {
     const val eventId = "eventId"
-    const val confirmUser = "confirmUser"
     const val userName = "userName"
     const val displayMode = "displayMode"
 }
@@ -30,13 +29,12 @@ object Routes {
     const val achievements = Screens.achievementsScreen
     const val profile = Screens.profileScreen
     const val eventDetails =
-        "${Screens.eventDetailsScreen}/{${NavArguments.eventId}}/{${NavArguments.confirmUser}}"
+        "${Screens.eventDetailsScreen}/{${NavArguments.eventId}}"
 }
 
 object Navigation {
-    val eventDetailsDestination = { eventId: String, confirmUser: Boolean ->
+    val eventDetailsDestination = { eventId: String ->
         Routes.eventDetails.replace("{${NavArguments.eventId}}", eventId)
-            .replace("{${NavArguments.confirmUser}}", confirmUser.toString())
     }
     val onBoardingDestination = { userName: String, displayMode: DisplayMode ->
         Routes.onBoarding.replace("{${NavArguments.userName}}", userName)

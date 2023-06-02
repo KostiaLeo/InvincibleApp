@@ -101,9 +101,13 @@ fun AchievementsScreen(
             ) {
                 item {
                     Level(state)
-                    Spacer(modifier = Modifier.height(24.dp))
                 }
-                statistics(state.statistics)
+                if (state.statistics.isNotEmpty()) {
+                    item {
+                        Spacer(modifier = Modifier.height(24.dp))
+                    }
+                    statistics(state.statistics)
+                }
                 item {
                     Spacer(modifier = Modifier.height(40.dp))
                 }

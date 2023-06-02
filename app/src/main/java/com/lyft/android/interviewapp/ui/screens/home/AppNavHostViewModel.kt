@@ -13,43 +13,44 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeScreenViewModel @Inject constructor(
+class AppNavHostViewModel @Inject constructor(
     private val qrCodeScannedUseCase: QrCodeScannedUseCase
 ) : ViewModel() {
 
-    var screenUiState by mutableStateOf(HomeScreenUiState())
+    var uiState by mutableStateOf(AppNavHostUiState())
         private set
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Log.e("ERROR_HOME", throwable.localizedMessage, throwable)
-        screenUiState = screenUiState.copy(
+        Log.e("ERROR_NAV_HOST", throwable.localizedMessage, throwable)
+        uiState = uiState.copy(
             isLoading = false,
-            errorMessage = "Щось пішло не так"
+            isSuccess = false,
+            message = "Упс, щось пішло не так",
+            description = "Ми не змогли підтвердити вашу присутність"
         )
     }
 
     fun onQrCodeScanned(result: String?) {
         viewModelScope.launch(exceptionHandler) {
-            screenUiState = screenUiState.copy(isLoading = true)
+            uiState = uiState.copy(isLoading = true)
             qrCodeScannedUseCase(result)
-            screenUiState = screenUiState.copy(
+            uiState = uiState.copy(
                 isLoading = false,
-                successMessage = "Ви успішно зареєструвались на захід"
+                isSuccess = true,
+                message = "Ваша присутність підтверджена",
+                description = "Дякуємо за участь у місії"
             )
         }
     }
 
-    fun onErrorShown() {
-        screenUiState = screenUiState.copy(errorMessage = null)
-    }
-
-    fun onSuccessShown() {
-        screenUiState = screenUiState.copy(successMessage = null)
+    fun onMessageShown() {
+        uiState = uiState.copy(message = null)
     }
 }
 
-data class HomeScreenUiState(
-    val errorMessage: String? = null,
-    val successMessage: String? = null,
+data class AppNavHostUiState(
+    val message: String? = null,
+    val description: String? = null,
+    val isSuccess: Boolean = false,
     val isLoading: Boolean = false
 )

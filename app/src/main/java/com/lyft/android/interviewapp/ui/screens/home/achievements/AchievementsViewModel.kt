@@ -66,11 +66,11 @@ class AchievementsViewModel @Inject constructor(
 }
 
 suspend fun MyInfoResponse.mapToCollectionItems(): List<PuzzleCollectionItem> = buildList {
-    if (puzzleSlots == 0) {
+    if (puzzleSlotsCount == 0) {
         add(PuzzleCollectionItem.NoItems)
         return@buildList
     }
-    if (puzzleSlots > completedPuzzlesIds.size && currentPuzzlePieces.isEmpty()) {
+    if (puzzleSlotsCount > completedPuzzlesIds.size && currentPuzzlePieces.isEmpty()) {
         add(PuzzleCollectionItem.EmptySlot)
     }
     val storageRef = Firebase.storage.reference

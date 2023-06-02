@@ -68,7 +68,7 @@ fun OnBoardingScreen(
     onNameChanged: (String) -> Unit,
     onCitySelected: (City) -> Unit,
     onCreateAccountClicked: () -> Unit,
-    onAccountCreated: () -> Unit,
+    onCompleted: (name: String) -> Unit,
     onCloseClicked: () -> Unit
 ) {
     val context = LocalContext.current
@@ -175,9 +175,9 @@ fun OnBoardingScreen(
         }
     )
 
-    if (state.isAccountCreated) {
+    if (state.isAccountAlterationCompleted) {
         LaunchedEffect(Unit) {
-            onAccountCreated()
+            onCompleted(state.name)
         }
     }
 }

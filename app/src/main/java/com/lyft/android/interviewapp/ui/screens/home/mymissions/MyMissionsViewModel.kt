@@ -70,7 +70,7 @@ data class MyMissionsUiState(
 
 private val myMissionsFilters by lazy {
     listOf(
-        EventFilter("Активні", false, 0),
-        EventFilter("Завершені", false, 1),
+        EventFilter("Активні", false, 5),
+        EventFilter("Завершені", false, 6),
     )
 }

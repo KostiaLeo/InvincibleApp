@@ -2,7 +2,6 @@ package com.lyft.android.interviewapp.data.repository
 
 import com.lyft.android.interviewapp.data.mappers.mapToUiModel
 import com.lyft.android.interviewapp.data.remote.api.VolunteerEventsApi
-import com.lyft.android.interviewapp.data.remote.models.RegisterForEventResponse
 import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
 import com.lyft.android.interviewapp.data.repository.models.ShortEventUiModel
 import com.lyft.android.interviewapp.ui.screens.onboarding.City
@@ -28,8 +27,9 @@ class RemoteVolunteerEventsRepository @Inject constructor(
             ).events.map { it.mapToUiModel() }
         }
 
-    override suspend fun registerForEvent(eventId: String): RegisterForEventResponse =
+    override suspend fun registerForEvent(eventId: String) {
         volunteerEventsApi.registerForEvent(eventId)
+    }
 
     override suspend fun getEventDetails(id: String): EventDetailsUiModel =
         withContext(dispatcherProvider.io) {
@@ -42,8 +42,9 @@ class RemoteVolunteerEventsRepository @Inject constructor(
 
     override suspend fun getMyMissionsList(filter: EventFilter?): List<ShortEventUiModel> =
         withContext(dispatcherProvider.io) {
-            volunteerEventsApi.getMyMissionsList().events.map { it.mapToUiModel() }
+            volunteerEventsApi.getMyMissionsList(filter?.id).events.map { it.mapToUiModel() }
         }
 }
+
 
 private data class ConfirmPresenceRequest(val qrCodeContent: String)

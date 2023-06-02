@@ -1,7 +1,6 @@
 package com.lyft.android.interviewapp.ui.screens.home
 
 import android.view.View
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.animateColorAsState
@@ -39,16 +38,16 @@ import com.lyft.android.interviewapp.ui.screens.home.profile.ProfileScreen
 import com.lyft.android.interviewapp.ui.screens.home.profile.ProfileViewModel
 import com.lyft.android.interviewapp.ui.screens.home.search.SearchViewModel
 import com.lyft.android.interviewapp.ui.screens.home.search.content.SearchScreen
-import com.lyft.android.interviewapp.ui.screens.qrcode.QrCodeActivityResultContract
 import com.lyft.android.interviewapp.ui.theme.PrimaryColor
 import com.lyft.android.interviewapp.ui.theme.TextColor
 
 @Composable
 fun HomeScreen(
     onEventClicked: (eventId: String) -> Unit,
-    onQrCodeScanned: (qrCodeContent: String?) -> Unit,
+    onQrCodeClicked: () -> Unit,
     onLoggedOut: () -> Unit,
     onEditProfileClicked: (userName: String) -> Unit,
+    newName: String?
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
@@ -58,12 +57,6 @@ fun HomeScreen(
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
     }
-
-    val homeViewModel = hiltViewModel<HomeScreenViewModel>()
-    val qrCodeLauncher = rememberLauncherForActivityResult(
-        contract = QrCodeActivityResultContract,
-        onResult = onQrCodeScanned
-    )
 
     val items = remember {
         listOf(
@@ -131,9 +124,7 @@ fun HomeScreen(
                     state = state,
                     onEventClicked = onEventClicked,
                     onFilterSelected = viewModel::onFilterSelected,
-                    onQrCodeClicked = {
-                        qrCodeLauncher.launch(Unit)
-                    },
+                    onQrCodeClicked = onQrCodeClicked,
                     onCitySelected = viewModel::onCitySelected,
                     onRefresh = viewModel::refresh
                 )
@@ -147,9 +138,7 @@ fun HomeScreen(
                     state = state,
                     onEventClicked = onEventClicked,
                     onFilterSelected = viewModel::onFilterSelected,
-                    onQrCodeClicked = {
-                        qrCodeLauncher.launch(Unit)
-                    },
+                    onQrCodeClicked = onQrCodeClicked,
                     onRefresh = viewModel::refresh
                 )
             }
@@ -157,7 +146,7 @@ fun HomeScreen(
                 val viewModel = hiltViewModel<AchievementsViewModel>()
                 AchievementsScreen(
                     viewModel.uiState,
-                    onQrCodeClicked = { qrCodeLauncher.launch(Unit) },
+                    onQrCodeClicked = onQrCodeClicked,
                     onRefresh = viewModel::refresh
                 )
             }
@@ -168,9 +157,14 @@ fun HomeScreen(
                         onLoggedOut()
                     }
                 }
+                val uiState = remember(viewModel.uiState, newName) {
+                    viewModel.uiState.run {
+                        copy(name = newName ?: name)
+                    }
+                }
                 ProfileScreen(
-                    viewModel.uiState,
-                    onQrCodeClicked = { qrCodeLauncher.launch(Unit) },
+                    uiState,
+                    onQrCodeClicked = onQrCodeClicked,
                     onEditProfileClicked = {
                         onEditProfileClicked(viewModel.uiState.name)
                     },

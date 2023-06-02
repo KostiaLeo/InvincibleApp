@@ -1,6 +1,7 @@
 package com.lyft.android.interviewapp.data.repository.models
 
 import androidx.compose.ui.graphics.Color
+import com.lyft.android.interviewapp.data.remote.models.OrganizerInfo
 import com.lyft.android.interviewapp.ui.theme.LightGrayBackgroundColor
 import com.lyft.android.interviewapp.ui.theme.PrimaryColor
 import com.lyft.android.interviewapp.ui.theme.TextColor
@@ -11,9 +12,8 @@ data class EventDetailsUiModel(
     val name: String = "",
     val location: String = "",
     val volunteersCount: String = "", // 12/50
-    val organizer: String = "",
+    val organizer: OrganizerInfo = OrganizerInfo(),
     val description: String = "",
-    val duties: String = "",
     val photos: List<String> = emptyList(),
     val buttonConfigs: RegisterButtonConfigs = RegisterButtonConfigs.fromEventStatus(
         EventStatus.NONE,
@@ -22,7 +22,15 @@ data class EventDetailsUiModel(
 )
 
 enum class RegistrationStatus {
-    AVAILABLE, REGISTERED, CONFIRMED, UNKNOWN
+    AVAILABLE, FULL, REGISTERED, CONFIRMED, UNKNOWN;
+
+    companion object {
+
+        fun fromInt(value: Int): RegistrationStatus {
+            return RegistrationStatus.values().getOrElse(value) { UNKNOWN }
+        }
+    }
+
 }
 
 enum class EventStatus {
@@ -76,9 +84,16 @@ class RegisterButtonConfigs(
                     Color(0xFF0694A2)
                 )
 
+                registrationStatus == RegistrationStatus.FULL -> RegisterButtonConfigs(
+                    LightGrayBackgroundColor,
+                    "Набір завершено",
+                    false,
+                    Color(0xFF374151)
+                )
+
                 registrationStatus == RegistrationStatus.UNKNOWN -> RegisterButtonConfigs(
                     Color(0xFF9CA3AF),
-                    "Сталася помилка",
+                    "...",
                     false,
                     TextColor
                 )

@@ -4,63 +4,56 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.lyft.android.interviewapp.data.repository.VolunteerEventsRepository
 import com.lyft.android.interviewapp.data.repository.models.EventDetailsUiModel
 import com.lyft.android.interviewapp.ui.navigation.NavArguments
-import com.lyft.android.interviewapp.ui.screens.qrcode.QrCodeScannedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
 class EventDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: VolunteerEventsRepository,
-    private val qrCodeScannedUseCase: QrCodeScannedUseCase
+    private val repository: VolunteerEventsRepository
 ) : ViewModel() {
     private val _uiStateFlow = MutableStateFlow(PlaceDetailsUiState())
     val uiStateFlow = _uiStateFlow.asStateFlow()
 
     private val eventId: String by lazy { savedStateHandle[NavArguments.eventId]!! }
-    private val confirmUser: Boolean by lazy { savedStateHandle[NavArguments.confirmUser]!! }
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         handleError(throwable)
     }
 
     init {
-        loadEvent()
-    }
-
-    private fun loadEvent() {
-        viewModelScope.launch(exceptionHandler) {
-            refresh()
-            if (confirmUser) {
-                launch {
-                    repository.confirmPresence(eventId)
-                    _uiStateFlow.update {
-                        it.copy(
-                            isLoading = false,
-                            showConfirmedMessage = true
-                        )
-                    }
-                }
-            }
-        }
+        refresh()
     }
 
     fun refresh() {
+        val storageRef = Firebase.storage.reference
         viewModelScope.launch(exceptionHandler) {
             _uiStateFlow.update { it.copy(isLoading = true) }
+            val photos = async {
+                storageRef.child(eventId).listAll().await()
+                    .items.map { async { it.downloadUrl.await() } }
+                    .awaitAll()
+                    .map { it.toString() }
+            }
             val eventDetails = repository.getEventDetails(eventId)
+            Log.d("EVENT_DETAILS", eventDetails.toString())
             _uiStateFlow.update {
                 it.copy(
                     isLoading = false,
-                    details = eventDetails
+                    details = eventDetails.copy(photos = photos.await())
                 )
             }
         }
@@ -71,12 +64,6 @@ class EventDetailsViewModel @Inject constructor(
             _uiStateFlow.update { it.copy(isLoading = true) }
             repository.registerForEvent(eventId)
             refresh()
-        }
-    }
-
-    fun onQrCodeScanned(result: String?) {
-        viewModelScope.launch(exceptionHandler) {
-            qrCodeScannedUseCase(result)
         }
     }
 

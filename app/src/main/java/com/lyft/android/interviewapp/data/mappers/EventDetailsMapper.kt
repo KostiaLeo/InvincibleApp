@@ -23,10 +23,10 @@ private val timeFormat by lazy(LazyThreadSafetyMode.NONE) {
 }
 
 fun EventDetailsResponse.mapToUiModel(): EventDetailsUiModel {
-    val dateTime = eventInfo.date.toDateTime()
+    val dateTime = eventInfo.date.toDateTime(eventInfo.length)
     val volunteersCount = "${eventInfo.curVolunteers}/${eventInfo.maxVolunteers}"
     val eventStatus = EventStatus.fromInt(eventInfo.status)
-    val registrationStatus = RegistrationStatus.AVAILABLE
+    val registrationStatus = RegistrationStatus.fromInt(eventInfo.volunteerStatus)
 
     return EventDetailsUiModel(
         id = eventInfo.id,
@@ -34,9 +34,8 @@ fun EventDetailsResponse.mapToUiModel(): EventDetailsUiModel {
         name = eventInfo.name,
         location = eventInfo.location,
         volunteersCount = volunteersCount,
-        organizer = eventInfo.organizer ?: "Руслан організатор",
-        description = eventInfo.desctiption,
-        duties = eventInfo.duties.orEmpty(),
+        organizer = eventInfo.organizer,
+        description = eventInfo.description,
         photos = emptyList(),
         buttonConfigs = RegisterButtonConfigs.fromEventStatus(eventStatus, registrationStatus)
     )
@@ -47,19 +46,19 @@ fun ShortEvent.mapToUiModel(): ShortEventUiModel {
 
     return ShortEventUiModel(
         id = id,
-        dateTime = date.toDateTime(),
+        dateTime = date.toDateTime(length),
         name = name,
         location = location,
         volunteersCount = volunteersCount
     )
 }
 
-private fun String.toDateTime(): String {
+private fun String.toDateTime(duration: Int): String {
     val millis = Instant.parse(this).toEpochMilli()
     val date = dateFormat.format(millis)
 
     val startMillis = Instant.parse(this).toEpochMilli()
-    val endMillis = startMillis + TimeUnit.HOURS.toMillis(2)
+    val endMillis = startMillis + TimeUnit.HOURS.toMillis(duration.toLong())
     val timeRange = "${timeFormat.format(startMillis)} - ${timeFormat.format(endMillis)}"
 
     return "$date • $timeRange"

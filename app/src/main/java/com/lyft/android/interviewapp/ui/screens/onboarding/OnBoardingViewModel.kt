@@ -40,7 +40,7 @@ class OnBoardingViewModel @Inject constructor(
             name = name,
             selectedCity = selectedCity,
             isReadyToRegister = name.isNotBlank() && selectedCity != null,
-            isAccountCreated = isAccountCreated,
+            isAccountAlterationCompleted = isAccountCreated,
             showProgress = showProgress,
             displayMode = displayMode
         )
@@ -75,7 +75,7 @@ data class OnBoardingUiState(
     val name: String = "",
     val selectedCity: City? = null,
     val isReadyToRegister: Boolean = false,
-    val isAccountCreated: Boolean = false,
+    val isAccountAlterationCompleted: Boolean = false,
     val showProgress: Boolean = false,
     val displayMode: DisplayMode = DisplayMode.CREATE_ACCOUNT
 )
