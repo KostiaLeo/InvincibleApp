@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -26,6 +29,7 @@ import com.lyft.android.interviewapp.ui.theme.TextColor
 
 private const val googleSignInRequestCode = 1
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LoginScreen(
     state: LoginUiState,
@@ -56,25 +60,42 @@ fun LoginScreen(
         backgroundColor = PrimaryColor,
         topBar = {},
         content = { paddingValues ->
-            Column(
+            val pullRefreshState = rememberPullRefreshState(
+                refreshing = state.showProgress,
+                onRefresh = {}
+            )
+            Box(
                 modifier = Modifier
                     .padding(paddingValues)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxSize()
+                    .pullRefresh(pullRefreshState, enabled = false)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(painter = painterResource(R.drawable.app_logo), contentDescription = null)
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = "Цифрова\n" +
-                                "волонтерська\n" +
-                                "патформа",
-                        color = Color.White,
-                        fontWeight = FontWeight.W500,
-                        fontSize = 14.sp
-                    )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(R.drawable.app_logo),
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = "Цифрова\n" +
+                                    "волонтерська\n" +
+                                    "патформа",
+                            color = Color.White,
+                            fontWeight = FontWeight.W500,
+                            fontSize = 14.sp
+                        )
+                    }
                 }
+                PullRefreshIndicator(
+                    refreshing = state.showProgress, state = pullRefreshState,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
             }
         },
         bottomBar = {
