@@ -53,7 +53,7 @@ class AchievementsViewModel @Inject constructor(
                     isLoading = false,
                     experience = it.experience,
                     level = it.level,
-                    statistics = it.statistics.statList,
+                    statistics = it.statistics.statsList,
                     puzzlesCollection = it.mapToCollectionItems()
                 )
             }
