@@ -37,7 +37,9 @@ object Navigation {
         Routes.eventDetails.replace("{${NavArguments.eventId}}", eventId)
     }
     val onBoardingDestination = { userName: String, displayMode: DisplayMode ->
-        Routes.onBoarding.replace("{${NavArguments.userName}}", userName)
+        Routes.onBoarding.replace(
+            "{${NavArguments.userName}}",
+            userName.takeUnless { it.isBlank() } ?: "name")
             .replace("{${NavArguments.displayMode}}", displayMode.name)
     }
 }
