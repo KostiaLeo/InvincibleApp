@@ -188,7 +188,8 @@ fun AppNavHost(
                             } else {
                                 navController.navigate(Routes.home)
                             }
-                        }
+                        },
+                        onErrorShown = viewModel::onErrorShown
                     )
                 }
 

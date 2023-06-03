@@ -9,7 +9,7 @@ data class MyInfoResponse(
     val currentPuzzlePieces: List<Int>,
     val completedPuzzlesIds: List<Int>,
     val level: Int,
-    val statistics: Statistics
+    val statistics: List<Stat>
 )
 
 data class Statistics(val statsList: List<Stat> = emptyList())

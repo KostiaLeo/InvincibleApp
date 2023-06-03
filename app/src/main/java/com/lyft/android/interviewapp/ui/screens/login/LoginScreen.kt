@@ -1,9 +1,11 @@
 package com.lyft.android.interviewapp.ui.screens.login
 
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -34,7 +36,8 @@ private const val googleSignInRequestCode = 1
 fun LoginScreen(
     state: LoginUiState,
     onAuthResult: (Task<GoogleSignInAccount>?) -> Unit,
-    onLoginCompleted: (isNewUser: Boolean, userName: String) -> Unit
+    onLoginCompleted: (isNewUser: Boolean, userName: String) -> Unit,
+    onErrorShown: () -> Unit
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
@@ -45,7 +48,10 @@ fun LoginScreen(
     }
     val authResultLauncher = rememberLauncherForActivityResult(
         contract = SignInGoogleContract,
-        onResult = onAuthResult
+        onResult = {
+            Log.d("LOGIN_FLOW", "onResult: $it")
+            onAuthResult(it)
+        }
     )
 
     if (state.isLoginCompleted) {
@@ -55,6 +61,16 @@ fun LoginScreen(
     }
 
     Spacer(modifier = Modifier.height(16.dp))
+
+    val scaffoldState = rememberScaffoldState()
+
+    if (state.errorMessage != null) {
+        Log.d("LOGIN_FLOW", "error msg on ui: ${state.errorMessage}")
+        LaunchedEffect(state.errorMessage) {
+            scaffoldState.snackbarHostState.showSnackbar(state.errorMessage)
+            onErrorShown()
+        }
+    }
 
     Scaffold(
         backgroundColor = PrimaryColor,
@@ -112,6 +128,7 @@ fun LoginScreen(
                         contentColor = TextColor
                     ),
                     onClick = {
+                        Log.d("LOGIN_FLOW", "Button clicked")
                         authResultLauncher.launch(googleSignInRequestCode)
                     }
                 ) {
@@ -129,6 +146,54 @@ fun LoginScreen(
                     )
                 }
             }
+        },
+        scaffoldState = scaffoldState,
+        snackbarHost = {
+            SnackbarHost(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 64.dp, start = 16.dp, end = 16.dp),
+                hostState = it,
+                snackbar = { snackbarData ->
+                    Snackbar(
+                        modifier = Modifier.fillMaxWidth(),
+                        backgroundColor = Color(0xFFFDE8E8),
+                        contentColor = Color(0xFFC81E1E),
+                        shape = RoundedCornerShape(8.dp),
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
+                            val contentColor = Color(0xFFC81E1E)
+                            Row {
+                                Icon(
+                                    painter = painterResource(
+                                        R.drawable.oops
+                                    ),
+                                    contentDescription = null,
+                                    tint = contentColor
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Упс, щось пішло не так",
+                                    color = contentColor,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.W500
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = snackbarData.message,
+                                color = contentColor,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.W300
+                            )
+                        }
+                    }
+                }
+            )
         }
     )
 }
@@ -140,7 +205,8 @@ fun LoginScreenPreview() {
         LoginScreen(
             state = LoginUiState(),
             onAuthResult = {},
-            onLoginCompleted = { _, _ -> }
+            onLoginCompleted = { _, _ -> },
+            onErrorShown = {}
         )
     }
 }
