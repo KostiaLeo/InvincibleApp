@@ -84,7 +84,9 @@ suspend fun MyInfoResponse.mapToCollectionItems(): List<PuzzleCollectionItem> = 
                     Log.d("ACHIEVEMENTS", path)
                     storageRef.child(path)
                 }
-                .map { puzzleRef -> async { puzzleRef.downloadUrl.await() } }
+                .map { puzzleRef ->
+                    async { puzzleRef.downloadUrl.await() }
+                }
                 .awaitAll()
                 .map(Uri::toString)
         }

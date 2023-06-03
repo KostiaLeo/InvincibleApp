@@ -2,6 +2,7 @@
 
 package com.lyft.android.interviewapp.ui.screens.home.achievements
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -106,8 +107,8 @@ fun AchievementsScreen(
                     item {
                         Spacer(modifier = Modifier.height(24.dp))
                     }
-                    statistics(state.statistics)
                 }
+                statistics(state.statistics)
                 item {
                     Spacer(modifier = Modifier.height(40.dp))
                 }
@@ -161,12 +162,17 @@ fun Level(state: AchievementsUiState) {
             fontWeight = FontWeight.W300,
             color = HintTextColor
         )
-        Text(text = "${state.experience % 100}/100", fontSize = 13.sp, fontWeight = FontWeight.W300)
+        val exp =
+            if (state.experience % 100 == 0 && state.experience != 0) 100 else state.experience % 100
+        Text(text = "${exp}/100", fontSize = 13.sp, fontWeight = FontWeight.W300)
     }
 }
 
 fun LazyListScope.statistics(statistics: List<Stat>) {
-    statistics.chunked(2).forEachIndexed { index, stats ->
+    val chunked = statistics.chunked(2)
+    Log.d("ACHIEVEMENTS", chunked.joinToString { it.toString() })
+    chunked.forEachIndexed { index, stats ->
+
         if (index != 0) {
             item {
                 Spacer(modifier = Modifier.height(12.dp))
