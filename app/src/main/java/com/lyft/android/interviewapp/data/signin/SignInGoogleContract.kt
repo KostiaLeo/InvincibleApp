@@ -15,8 +15,6 @@ object SignInGoogleContract : ActivityResultContract<Int, Task<GoogleSignInAccou
     override fun createIntent(context: Context, input: Int): Intent {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(context.getString(R.string.volunteer_server_client_id))
-            .requestEmail()
-            .requestProfile()
             .build()
 
         Log.d("LOGIN_FLOW", "gso: $gso")
