@@ -62,7 +62,10 @@ import com.lyft.android.interviewapp.ui.screens.qrcode.QrCodeActivityResultContr
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = Routes.login
+    startDestination: String = Routes.login,
+    startLogin: () -> Unit,
+    idToken: String?,
+    name: String?,
 ) {
     val hostViewModel = hiltViewModel<AppNavHostViewModel>()
 
@@ -174,6 +177,11 @@ fun AppNavHost(
                 ) {
                     val viewModel: LoginViewModel = hiltViewModel()
                     val state by viewModel.uiState.collectAsStateWithLifecycle()
+                    if (idToken != null) {
+                        LaunchedEffect(idToken) {
+                            viewModel.onIdToken(idToken)
+                        }
+                    }
                     LoginScreen(
                         state = state,
                         onAuthResult = viewModel::handleGoogleAccountTask,
@@ -181,7 +189,7 @@ fun AppNavHost(
                             if (isNewUser) {
                                 navController.navigate(
                                     Navigation.onBoardingDestination(
-                                        userName,
+                                        name.orEmpty(),
                                         DisplayMode.CREATE_ACCOUNT
                                     )
                                 )
@@ -189,7 +197,8 @@ fun AppNavHost(
                                 navController.navigate(Routes.home)
                             }
                         },
-                        onErrorShown = viewModel::onErrorShown
+                        onErrorShown = viewModel::onErrorShown,
+                        startLogin = startLogin
                     )
                 }
 

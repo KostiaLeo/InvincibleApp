@@ -142,7 +142,7 @@ fun Level(state: AchievementsUiState) {
                 .fillMaxWidth()
         )
         LinearProgressIndicator(
-            progress = (state.experience % 100) / 100f,
+            progress = (state.experience % 100).toFloat() / 100f,
             color = PrimaryColor,
             backgroundColor = Color.Transparent,
             strokeCap = StrokeCap.Round,
@@ -162,8 +162,7 @@ fun Level(state: AchievementsUiState) {
             fontWeight = FontWeight.W300,
             color = HintTextColor
         )
-        val exp =
-            if (state.experience % 100 == 0 && state.experience != 0) 100 else state.experience % 100
+        val exp = state.experience % 100
         Text(text = "${exp}/100", fontSize = 13.sp, fontWeight = FontWeight.W300)
     }
 }

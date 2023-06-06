@@ -21,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences,
-    private val identityRepository: IdentityRepository
+    private val identityRepository: IdentityRepository,
+//    private val signInClient: SignInClient
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState = _uiState.asStateFlow()
@@ -32,6 +33,7 @@ class LoginViewModel @Inject constructor(
     }
 
     fun handleGoogleAccountTask(task: Task<GoogleSignInAccount>?) {
+//        Log.d("SIGNIN", signInClient.toString())
         Log.d("LOGIN_FLOW", "task: $task")
         viewModelScope.launch(exceptionHandler) {
             if (task == null) {
@@ -58,6 +60,30 @@ class LoginViewModel @Inject constructor(
                     isLoginCompleted = true,
                     isNewUser = isNewUser,
                     userName = account.givenName ?: account.displayName ?: ""
+                )
+            }
+        }
+    }
+
+    fun onIdToken(idToken: String) {
+        viewModelScope.launch(exceptionHandler) {
+            _uiState.update { it.copy(showProgress = true) }
+
+            sharedPreferences.idToken = idToken
+            val isNewUser = identityRepository.isNewUser()
+
+            if (!isNewUser) {
+                sharedPreferences.isSignedIn = true
+            }
+
+            Log.d("LOGIN_FLOW", "acc: idToken: $idToken, is new user: $isNewUser")
+
+            _uiState.update {
+                LoginUiState(
+                    showProgress = false,
+                    isLoginCompleted = true,
+                    isNewUser = isNewUser,
+//                    userName = account.givenName ?: account.displayName ?: ""
                 )
             }
         }

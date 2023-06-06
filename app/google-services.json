@@ -43,14 +43,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "36027353369-tfhurj904glrbgnmi76qr5ufbjt4mb9m.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.lyft.android.interviewapp",
-            "certificate_hash": "247f7ab5206c2c4193f0c02774197006d2195021"
-          }
-        },
-        {
           "client_id": "36027353369-3p0o9je5tisqgv2ks2m5pjehk7bh0c15.apps.googleusercontent.com",
           "client_type": 3
         }

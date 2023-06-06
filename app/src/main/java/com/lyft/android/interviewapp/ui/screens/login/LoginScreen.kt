@@ -36,6 +36,7 @@ private const val googleSignInRequestCode = 1
 fun LoginScreen(
     state: LoginUiState,
     onAuthResult: (Task<GoogleSignInAccount>?) -> Unit,
+    startLogin: () -> Unit,
     onLoginCompleted: (isNewUser: Boolean, userName: String) -> Unit,
     onErrorShown: () -> Unit
 ) {
@@ -120,6 +121,12 @@ fun LoginScreen(
                 backgroundColor = PrimaryColor,
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
             ) {
+
+//                val context = LocalContext.current
+//                val launcher = rememberLauncherForActivityResult(
+//                    contract = ActivityResultContracts.StartIntentSenderForResult(),
+//                    onResult = onResult
+//                )
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(vertical = 12.dp),
@@ -128,8 +135,7 @@ fun LoginScreen(
                         contentColor = TextColor
                     ),
                     onClick = {
-                        Log.d("LOGIN_FLOW", "Button clicked")
-                        authResultLauncher.launch(googleSignInRequestCode)
+                        startLogin()
                     }
                 ) {
                     Image(
@@ -206,7 +212,8 @@ fun LoginScreenPreview() {
             state = LoginUiState(),
             onAuthResult = {},
             onLoginCompleted = { _, _ -> },
-            onErrorShown = {}
+            onErrorShown = {},
+            startLogin = {}
         )
     }
 }
